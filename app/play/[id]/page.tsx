@@ -1,12 +1,19 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import type React from "react"
+
+import { useState, useMemo, useEffect } from "react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Maximize2, Minimize2, ThumbsUp, ThumbsDown, Share2, ArrowLeft } from "lucide-react"
+import { Maximize2, Minimize2, ThumbsUp, ThumbsDown, Share2, ArrowLeft, MessageSquare } from "lucide-react"
 import { playableGamesData } from "@/data/games"
+import { useRouter } from "next/navigation"
+
+// Add these imports at the top
+import { getUserId } from "@/lib/user-id"
+import { getLikes, getDislikes, getUserRating, type Comment } from "@/lib/kv"
 
 // Function to get the correct link for a similar game
 const getSimilarGameLink = (game: { id: string; title: string; type: string }) => {
@@ -19,11 +26,71 @@ const getSimilarGameLink = (game: { id: string; title: string; type: string }) =
 
 export default function PlayGame({ params }: { params: { id: string } }) {
   const [isFullscreen, setIsFullscreen] = useState(false)
+  // Replace the state hooks for likes and dislikes to include data loading
   const [likes, setLikes] = useState(0)
   const [dislikes, setDislikes] = useState(0)
   const [userRated, setUserRated] = useState(false)
+  const [comments, setComments] = useState<Comment[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [commentsLoading, setCommentsLoading] = useState(true)
+  const [newComment, setNewComment] = useState("")
+  const [userName, setUserName] = useState("")
+  const [showComments, setShowComments] = useState(false)
+  const router = useRouter()
 
   const game = playableGamesData.find((game) => game.id === params.id)
+
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [params.id])
+
+  // Update useEffect to load data from the server
+  useEffect(() => {
+    if (!game) return
+
+    const userId = getUserId()
+
+    async function loadRatings() {
+      try {
+        setIsLoading(true)
+
+        // Get likes and dislikes
+        const likesCount = await getLikes(game.id)
+        const dislikesCount = await getDislikes(game.id)
+        const userRating = await getUserRating(userId, game.id)
+
+        setLikes(likesCount)
+        setDislikes(dislikesCount)
+        setUserRated(!!userRating)
+
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Error loading ratings:", error)
+        setIsLoading(false)
+      }
+    }
+
+    async function loadComments() {
+      try {
+        setCommentsLoading(true)
+
+        const response = await fetch(`/api/comments?contentId=${game.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          setComments(data.comments || [])
+        }
+
+        setCommentsLoading(false)
+      } catch (error) {
+        console.error("Error loading comments:", error)
+        setCommentsLoading(false)
+      }
+    }
+
+    loadRatings()
+    loadComments()
+  }, [game])
 
   // Use useMemo to calculate styles instead of useState + useEffect
   const { iframeContainerStyle, iframeStyle } = useMemo(() => {
@@ -77,6 +144,11 @@ export default function PlayGame({ params }: { params: { id: string } }) {
       containerStyle.padding = "12px"
     }
 
+    // Add border styling
+    containerStyle.border = "1px solid rgba(var(--primary), 0.2)"
+    containerStyle.borderRadius = "0.5rem"
+    containerStyle.overflow = "hidden"
+
     return { iframeContainerStyle: containerStyle, iframeStyle: frameStyle }
   }, [game, isFullscreen])
 
@@ -105,17 +177,57 @@ export default function PlayGame({ params }: { params: { id: string } }) {
     setIsFullscreen(!isFullscreen)
   }
 
-  const handleLike = () => {
-    if (!userRated) {
-      setLikes(likes + 1)
-      setUserRated(true)
+  // Replace handleLike function
+  const handleLike = async () => {
+    if (!userRated && game) {
+      const userId = getUserId()
+
+      try {
+        const response = await fetch("/api/ratings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "like",
+            contentId: game.id,
+            userId,
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setLikes(data.count)
+          setUserRated(true)
+        }
+      } catch (error) {
+        console.error("Error liking game:", error)
+      }
     }
   }
 
-  const handleDislike = () => {
-    if (!userRated) {
-      setDislikes(dislikes + 1)
-      setUserRated(true)
+  // Replace handleDislike function
+  const handleDislike = async () => {
+    if (!userRated && game) {
+      const userId = getUserId()
+
+      try {
+        const response = await fetch("/api/ratings", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "dislike",
+            contentId: game.id,
+            userId,
+          }),
+        })
+
+        if (response.ok) {
+          const data = await response.json()
+          setDislikes(data.count)
+          setUserRated(true)
+        }
+      } catch (error) {
+        console.error("Error disliking game:", error)
+      }
     }
   }
 
@@ -129,6 +241,84 @@ export default function PlayGame({ params }: { params: { id: string } }) {
     } else {
       navigator.clipboard.writeText(window.location.href)
       alert("Link copied to clipboard!")
+    }
+  }
+
+  const handleSimilarGameClick = (gameLink: string) => {
+    router.push(gameLink)
+  }
+
+  // Replace handleSubmitComment function
+  const handleSubmitComment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!newComment.trim() || !userName.trim() || !game) return
+
+    try {
+      const response = await fetch("/api/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentId: game.id,
+          user: userName,
+          text: newComment,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setComments(data.comments)
+        setNewComment("")
+      }
+    } catch (error) {
+      console.error("Error submitting comment:", error)
+    }
+  }
+
+  // Replace handleLikeComment function
+  const handleLikeComment = async (commentId: string) => {
+    if (!game) return
+
+    try {
+      const response = await fetch("/api/comments", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentId: game.id,
+          commentId: commentId,
+          action: "like",
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setComments(data.comments)
+      }
+    } catch (error) {
+      console.error("Error liking comment:", error)
+    }
+  }
+
+  // Replace handleDislikeComment function
+  const handleDislikeComment = async (commentId: string) => {
+    if (!game) return
+
+    try {
+      const response = await fetch("/api/comments", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contentId: game.id,
+          commentId: commentId,
+          action: "dislike",
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setComments(data.comments)
+      }
+    } catch (error) {
+      console.error("Error disliking comment:", error)
     }
   }
 
@@ -163,7 +353,7 @@ export default function PlayGame({ params }: { params: { id: string } }) {
 
           {/* Game iframe container with dynamic sizing */}
           <div
-            className={`mb-8 transition-all duration-300 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden ${
+            className={`mb-8 transition-all duration-300 ${
               isFullscreen ? "fixed inset-0 z-50 bg-white dark:bg-zinc-900 p-4 border-0 rounded-none" : ""
             }`}
           >
@@ -202,7 +392,7 @@ export default function PlayGame({ params }: { params: { id: string } }) {
               size="sm"
               className={`gap-2 ${userRated ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={handleLike}
-              disabled={userRated}
+              disabled={userRated || isLoading}
             >
               <ThumbsUp className="w-4 h-4" />
               Like {likes > 0 && `(${likes})`}
@@ -212,16 +402,97 @@ export default function PlayGame({ params }: { params: { id: string } }) {
               size="sm"
               className={`gap-2 ${userRated ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={handleDislike}
-              disabled={userRated}
+              disabled={userRated || isLoading}
             >
               <ThumbsDown className="w-4 h-4" />
               Dislike {dislikes > 0 && `(${dislikes})`}
+            </Button>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowComments(!showComments)}>
+              <MessageSquare className="w-4 h-4" />
+              Comments {comments.length > 0 && `(${comments.length})`}
             </Button>
             <Button variant="outline" size="sm" className="gap-2 ml-auto" onClick={handleShare}>
               <Share2 className="w-4 h-4" />
               Share
             </Button>
           </div>
+
+          {/* Comments section */}
+          {showComments && (
+            <div className="mb-8 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4">
+              <h3 className="text-lg font-medium mb-4">Comments</h3>
+
+              {commentsLoading ? (
+                <div className="text-center py-4">
+                  <p className="text-zinc-500 dark:text-zinc-400">Loading comments...</p>
+                </div>
+              ) : comments.length === 0 ? (
+                <div className="text-center py-4">
+                  <p className="text-zinc-500 dark:text-zinc-400">No comments yet. Be the first to comment!</p>
+                </div>
+              ) : (
+                <div className="space-y-4 mb-6">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h4 className="font-medium">{comment.user}</h4>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            {new Date(comment.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleLikeComment(comment.id)}
+                            className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                          >
+                            <ThumbsUp className="w-3 h-3" /> {comment.likes}
+                          </button>
+                          <button
+                            onClick={() => handleDislikeComment(comment.id)}
+                            className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                          >
+                            <ThumbsDown className="w-3 h-3" /> {comment.dislikes}
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-sm">{comment.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmitComment} className="space-y-4">
+                <div>
+                  <label htmlFor="userName" className="block text-sm font-medium mb-1">
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    id="userName"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-transparent"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="comment" className="block text-sm font-medium mb-1">
+                    Your Comment
+                  </label>
+                  <textarea
+                    id="comment"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-transparent"
+                    rows={3}
+                    required
+                  />
+                </div>
+                <Button type="submit">Post Comment</Button>
+              </form>
+            </div>
+          )}
 
           {/* Game details */}
           <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -271,6 +542,8 @@ export default function PlayGame({ params }: { params: { id: string } }) {
                   key={similarGame.id}
                   href={getSimilarGameLink(similarGame)}
                   className="border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow no-underline"
+                  scroll={true}
+                  onClick={() => handleSimilarGameClick(getSimilarGameLink(similarGame))}
                 >
                   <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
                     <span className="text-2xl font-bold text-zinc-400">{similarGame.title[0]}</span>

@@ -70,11 +70,24 @@ export default function Home() {
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="mb-0">{game.title}</h3>
-                    <span className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs rounded-md">
-                      {game.genres[0]}
-                    </span>
+                    <div className="px-2 py-1 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-medium rounded-md">
+                      {game.rating}/10
+                    </div>
                   </div>
                   <p className="text-zinc-600 dark:text-zinc-400 mb-4">{game.description}</p>
+
+                  {/* Display all tags/genres */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {game.genres.map((genre) => (
+                      <span
+                        key={genre}
+                        className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs rounded-md"
+                      >
+                        {genre}
+                      </span>
+                    ))}
+                  </div>
+
                   <Link href={`/games/${game.id}`} className="text-sm font-medium">
                     View Details →
                   </Link>

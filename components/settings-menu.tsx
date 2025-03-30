@@ -19,18 +19,22 @@ export default function SettingsMenu() {
 
   // Apply custom CSS
   useEffect(() => {
-    if (!styleApplied) return
+    if (!styleApplied || !customCSS) return
 
-    const styleElement = document.createElement("style")
-    styleElement.id = "custom-css"
-    styleElement.innerHTML = customCSS
-    document.head.appendChild(styleElement)
+    try {
+      const styleElement = document.createElement("style")
+      styleElement.id = "custom-css"
+      styleElement.innerHTML = customCSS
+      document.head.appendChild(styleElement)
 
-    return () => {
-      const existingStyle = document.getElementById("custom-css")
-      if (existingStyle) {
-        document.head.removeChild(existingStyle)
+      return () => {
+        const existingStyle = document.getElementById("custom-css")
+        if (existingStyle) {
+          document.head.removeChild(existingStyle)
+        }
       }
+    } catch (error) {
+      console.error("Error applying custom CSS:", error)
     }
   }, [customCSS, styleApplied])
 
@@ -42,48 +46,92 @@ export default function SettingsMenu() {
 
     switch (colorScheme) {
       case "blue":
-        root.style.setProperty("--foreground", "15, 23, 42")
-        root.style.setProperty("--background", "255, 255, 255")
+        // Blue theme - actual blue colors
+        root.style.setProperty("--foreground", "23, 37, 84") // blue-900
+        root.style.setProperty("--background", "239, 246, 255") // blue-50
+        root.style.setProperty("--primary", "37, 99, 235") // blue-600
+        root.style.setProperty("--primary-foreground", "255, 255, 255") // white
+        root.style.setProperty("--secondary", "191, 219, 254") // blue-200
+        root.style.setProperty("--secondary-foreground", "30, 58, 138") // blue-800
         document.body.classList.remove("dark")
         setTheme("light")
         break
+
       case "green":
-        root.style.setProperty("--foreground", "20, 83, 45")
-        root.style.setProperty("--background", "240, 253, 244")
+        // Green theme - actual green colors
+        root.style.setProperty("--foreground", "6, 78, 59") // green-800
+        root.style.setProperty("--background", "240, 253, 244") // green-50
+        root.style.setProperty("--primary", "16, 185, 129") // green-600
+        root.style.setProperty("--primary-foreground", "255, 255, 255") // white
+        root.style.setProperty("--secondary", "187, 247, 208") // green-200
+        root.style.setProperty("--secondary-foreground", "6, 78, 59") // green-800
         document.body.classList.remove("dark")
         setTheme("light")
         break
+
       case "purple":
-        root.style.setProperty("--foreground", "88, 28, 135")
-        root.style.setProperty("--background", "250, 245, 255")
+        // Purple theme - actual purple colors
+        root.style.setProperty("--foreground", "76, 29, 149") // purple-900
+        root.style.setProperty("--background", "250, 245, 255") // purple-50
+        root.style.setProperty("--primary", "147, 51, 234") // purple-600
+        root.style.setProperty("--primary-foreground", "255, 255, 255") // white
+        root.style.setProperty("--secondary", "233, 213, 255") // purple-200
+        root.style.setProperty("--secondary-foreground", "88, 28, 135") // purple-800
         document.body.classList.remove("dark")
         setTheme("light")
         break
+
       case "dark-blue":
-        root.style.setProperty("--foreground", "191, 219, 254")
-        root.style.setProperty("--background", "30, 58, 138")
+        // Dark blue theme - actual dark blue colors
+        root.style.setProperty("--foreground", "219, 234, 254") // blue-100
+        root.style.setProperty("--background", "30, 58, 138") // blue-900
+        root.style.setProperty("--primary", "96, 165, 250") // blue-400
+        root.style.setProperty("--primary-foreground", "30, 58, 138") // blue-900
+        root.style.setProperty("--secondary", "37, 99, 235") // blue-600
+        root.style.setProperty("--secondary-foreground", "239, 246, 255") // blue-50
         document.body.classList.add("dark")
         setTheme("dark")
         break
+
       case "dark-green":
-        root.style.setProperty("--foreground", "187, 247, 208")
-        root.style.setProperty("--background", "20, 83, 45")
+        // Dark green theme - actual dark green colors
+        root.style.setProperty("--foreground", "220, 252, 231") // green-100
+        root.style.setProperty("--background", "6, 78, 59") // green-900
+        root.style.setProperty("--primary", "34, 197, 94") // green-500
+        root.style.setProperty("--primary-foreground", "6, 78, 59") // green-900
+        root.style.setProperty("--secondary", "16, 185, 129") // green-600
+        root.style.setProperty("--secondary-foreground", "240, 253, 244") // green-50
         document.body.classList.add("dark")
         setTheme("dark")
         break
+
       case "dark-purple":
-        root.style.setProperty("--foreground", "233, 213, 255")
-        root.style.setProperty("--background", "88, 28, 135")
+        // Dark purple theme - actual dark purple colors
+        root.style.setProperty("--foreground", "243, 232, 255") // purple-100
+        root.style.setProperty("--background", "76, 29, 149") // purple-900
+        root.style.setProperty("--primary", "192, 132, 252") // purple-400
+        root.style.setProperty("--primary-foreground", "76, 29, 149") // purple-900
+        root.style.setProperty("--secondary", "147, 51, 234") // purple-600
+        root.style.setProperty("--secondary-foreground", "250, 245, 255") // purple-50
         document.body.classList.add("dark")
         setTheme("dark")
         break
+
       default:
         // Reset to default
-        root.style.setProperty("--foreground", "24, 24, 27")
-        root.style.setProperty("--background", "255, 255, 255")
+        root.style.removeProperty("--foreground")
+        root.style.removeProperty("--background")
+        root.style.removeProperty("--primary")
+        root.style.removeProperty("--primary-foreground")
+        root.style.removeProperty("--secondary")
+        root.style.removeProperty("--secondary-foreground")
+
         if (theme === "dark") {
-          root.style.setProperty("--foreground", "244, 244, 245")
-          root.style.setProperty("--background", "24, 24, 27")
+          root.style.setProperty("--foreground", "244, 244, 245") // zinc-100
+          root.style.setProperty("--background", "24, 24, 27") // zinc-900
+        } else {
+          root.style.setProperty("--foreground", "24, 24, 27") // zinc-900
+          root.style.setProperty("--background", "255, 255, 255") // white
         }
     }
   }, [colorScheme, mounted, theme, setTheme])
@@ -102,6 +150,12 @@ export default function SettingsMenu() {
   const handleResetCSS = () => {
     setCustomCSS("")
     setStyleApplied(false)
+
+    // Remove any existing custom CSS
+    const existingStyle = document.getElementById("custom-css")
+    if (existingStyle) {
+      document.head.removeChild(existingStyle)
+    }
   }
 
   if (!mounted) {
@@ -119,10 +173,10 @@ export default function SettingsMenu() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      <div className={`relative ${isOpen ? "settings-open" : ""}`}>
+      <div className="relative">
         {/* Settings button */}
         <button
-          className={`flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-lg transition-all duration-300 ${isOpen ? "rotate-90" : ""}`}
+          className={`flex items-center justify-center w-12 h-12 rounded-full bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 shadow-lg hover:scale-110 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}
           onClick={toggleMenu}
           aria-label="Settings"
           aria-expanded={isOpen}
@@ -184,7 +238,7 @@ export default function SettingsMenu() {
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "blue" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
                   onClick={() => setColorScheme("blue")}
-                  style={{ background: "linear-gradient(to right, #dbeafe, #1e40af)" }}
+                  style={{ background: "linear-gradient(to right, #eff6ff, #1e40af)" }}
                   aria-label="Blue color scheme"
                 >
                   <span className="text-xs font-medium">Blue</span>
@@ -192,7 +246,7 @@ export default function SettingsMenu() {
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "green" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
                   onClick={() => setColorScheme("green")}
-                  style={{ background: "linear-gradient(to right, #dcfce7, #166534)" }}
+                  style={{ background: "linear-gradient(to right, #f0fdf4, #166534)" }}
                   aria-label="Green color scheme"
                 >
                   <span className="text-xs font-medium">Green</span>
@@ -200,7 +254,7 @@ export default function SettingsMenu() {
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "purple" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
                   onClick={() => setColorScheme("purple")}
-                  style={{ background: "linear-gradient(to right, #f3e8ff, #581c87)" }}
+                  style={{ background: "linear-gradient(to right, #faf5ff, #7e22ce)" }}
                   aria-label="Purple color scheme"
                 >
                   <span className="text-xs font-medium">Purple</span>
@@ -216,7 +270,7 @@ export default function SettingsMenu() {
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "dark-green" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
                   onClick={() => setColorScheme("dark-green")}
-                  style={{ background: "linear-gradient(to right, #14532d, #bbf7d0)" }}
+                  style={{ background: "linear-gradient(to right, #064e3b, #bbf7d0)" }}
                   aria-label="Dark green color scheme"
                 >
                   <span className="text-xs font-medium text-white">Dark Green</span>
@@ -251,47 +305,6 @@ export default function SettingsMenu() {
           </div>
         </div>
       </div>
-
-      {/* CSS for animation */}
-      <style jsx>{`
-        .settings-open button::before {
-          content: '';
-          position: absolute;
-          width: 12px;
-          height: 12px;
-          background-color: inherit;
-          top: -6px;
-          right: 0;
-          border-radius: 50%;
-          transition: all 0.3s ease;
-          opacity: 0;
-        }
-        
-        .settings-open button::after {
-          content: 'Settings';
-          position: absolute;
-          background-color: inherit;
-          color: inherit;
-          padding: 0.25rem 0.5rem;
-          border-radius: 0.25rem;
-          font-size: 0.75rem;
-          top: -2rem;
-          right: 0;
-          white-space: nowrap;
-          transition: all 0.3s ease;
-          opacity: 0;
-        }
-        
-        .settings-open:hover button::before {
-          opacity: 1;
-          transform: translateX(-24px);
-        }
-        
-        .settings-open:hover button::after {
-          opacity: 1;
-          transform: translateY(-0.5rem);
-        }
-      `}</style>
     </div>
   )
 }
