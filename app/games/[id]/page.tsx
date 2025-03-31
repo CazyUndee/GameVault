@@ -8,8 +8,10 @@ import Footer from "@/components/footer"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ThumbsUp, ThumbsDown } from "lucide-react"
+import { ThumbsUp, ThumbsDown, Heart, BookmarkPlus, ShoppingCart } from "lucide-react"
 import { gamesData } from "@/data/games"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 
 // Function to get the correct link for a similar game
 const getSimilarGameLink = (game: { id: string; title: string; type: string }) => {
@@ -50,6 +52,29 @@ const getShopUrl = (game: any) => {
 
 export default function GameDetails({ params }: { params: { id: string } }) {
   const game = gamesData.find((game) => game.id === params.id)
+  const { user, addFavorite, removeFavorite, addToWishlist, removeFromWishlist } = useAuth()
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [likes, setLikes] = useState(0)
+  const [dislikes, setDislikes] = useState(0)
+  const [userRated, setUserRated] = useState(false)
+  const router = useRouter()
+
+  // Check if game is in favorites or wishlist
+  const isFavorite = user ? user.favorites.includes(params.id) : false
+  const isWishlisted = user ? user.wishlist.includes(params.id) : false
+
+  // Load likes and dislikes
+  useEffect(() => {
+    if (!game) return
+
+    // Simulate loading likes/dislikes from server
+    // In a real app, this would be an API call
+    const simulatedLikes = Math.floor(Math.random() * 100) + 10
+    const simulatedDislikes = Math.floor(Math.random() * 20) + 1
+
+    setLikes(simulatedLikes)
+    setDislikes(simulatedDislikes)
+  }, [game])
 
   if (!game) {
     return (
@@ -74,6 +99,60 @@ export default function GameDetails({ params }: { params: { id: string } }) {
 
   // Get the shop URL for this game
   const shopUrl = getShopUrl(game)
+
+  // Handle like
+  const handleLike = () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (!userRated) {
+      setLikes(likes + 1)
+      setUserRated(true)
+    }
+  }
+
+  // Handle dislike
+  const handleDislike = () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (!userRated) {
+      setDislikes(dislikes + 1)
+      setUserRated(true)
+    }
+  }
+
+  // Handle favorite toggle
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (isFavorite) {
+      await removeFavorite(game.id)
+    } else {
+      await addFavorite(game.id)
+    }
+  }
+
+  // Handle wishlist toggle
+  const handleToggleWishlist = async () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (isWishlisted) {
+      await removeFromWishlist(game.id)
+    } else {
+      await addToWishlist(game.id)
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -137,8 +216,53 @@ export default function GameDetails({ params }: { params: { id: string } }) {
                 </div>
               </div>
 
+              {/* Game actions */}
+              <div className="flex flex-wrap gap-4 mb-6">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`gap-2 ${userRated ? "opacity-50 cursor-not-allowed" : ""}`}
+                  onClick={handleLike}
+                  disabled={userRated}
+                >
+                  <ThumbsUp className="w-4 h-4" />
+                  Like {likes > 0 && `(${likes})`}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`gap-2 ${userRated ? "opacity-50 cursor-not-allowed" : ""}`}
+                  onClick={handleDislike}
+                  disabled={userRated}
+                >
+                  <ThumbsDown className="w-4 h-4" />
+                  Dislike {dislikes > 0 && `(${dislikes})`}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`gap-2 ${isFavorite ? "text-red-500" : ""}`}
+                  onClick={handleToggleFavorite}
+                >
+                  <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
+                  {isFavorite ? "Favorited" : "Favorite"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`gap-2 ${isWishlisted ? "text-blue-500" : ""}`}
+                  onClick={handleToggleWishlist}
+                >
+                  <BookmarkPlus className="w-4 h-4" />
+                  {isWishlisted ? "Wishlisted" : "Add to Wishlist"}
+                </Button>
+              </div>
+
               <a href={shopUrl} target="_blank" rel="noopener noreferrer" className="w-full">
-                <Button className="w-full">Purchase Game</Button>
+                <Button className="w-full flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5" />
+                  Purchase Game
+                </Button>
               </a>
             </div>
           </div>
@@ -261,6 +385,33 @@ export default function GameDetails({ params }: { params: { id: string } }) {
         </div>
       </main>
 
+      {/* Login prompt modal */}
+      {showLoginPrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">Login Required</h3>
+            <p className="mb-6">
+              You need to be logged in to use this feature. Would you like to login or create an account?
+            </p>
+            <div className="flex gap-4">
+              <Button
+                variant="default"
+                className="flex-1"
+                onClick={() => {
+                  setShowLoginPrompt(false)
+                  router.push("/auth")
+                }}
+              >
+                Login / Signup
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => setShowLoginPrompt(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   )
@@ -281,6 +432,9 @@ function CommentsSection({ gameId }: { gameId: string }) {
   const [newComment, setNewComment] = useState("")
   const [userName, setUserName] = useState("")
   const [isLoading, setIsLoading] = useState(true)
+  const { user } = useAuth()
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const router = useRouter()
 
   // Load comments from the server
   useEffect(() => {
@@ -307,7 +461,13 @@ function CommentsSection({ gameId }: { gameId: string }) {
   // Replace handleSubmitComment function
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newComment.trim() || !userName.trim()) return
+
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (!newComment.trim()) return
 
     try {
       const response = await fetch("/api/comments", {
@@ -315,7 +475,7 @@ function CommentsSection({ gameId }: { gameId: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contentId: gameId,
-          user: userName,
+          user: user.username,
           text: newComment,
         }),
       })
@@ -332,6 +492,11 @@ function CommentsSection({ gameId }: { gameId: string }) {
 
   // Replace handleLikeComment function
   const handleLikeComment = async (commentId: string) => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     try {
       const response = await fetch("/api/comments", {
         method: "PUT",
@@ -354,6 +519,11 @@ function CommentsSection({ gameId }: { gameId: string }) {
 
   // Replace handleDislikeComment function
   const handleDislikeComment = async (commentId: string) => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     try {
       const response = await fetch("/api/comments", {
         method: "PUT",
@@ -424,19 +594,6 @@ function CommentsSection({ gameId }: { gameId: string }) {
             className="space-y-4 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4"
           >
             <div>
-              <label htmlFor="userName" className="block text-sm font-medium mb-1">
-                Your Name
-              </label>
-              <input
-                type="text"
-                id="userName"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-transparent"
-                required
-              />
-            </div>
-            <div>
               <label htmlFor="comment" className="block text-sm font-medium mb-1">
                 Your Comment
               </label>
@@ -447,11 +604,42 @@ function CommentsSection({ gameId }: { gameId: string }) {
                 className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-transparent"
                 rows={3}
                 required
+                placeholder={user ? "Write your comment..." : "Login to comment"}
+                disabled={!user}
               />
             </div>
-            <Button type="submit">Post Comment</Button>
+            <Button type="submit" disabled={!user}>
+              {user ? "Post Comment" : "Login to Comment"}
+            </Button>
           </form>
         </>
+      )}
+
+      {/* Login prompt modal */}
+      {showLoginPrompt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">Login Required</h3>
+            <p className="mb-6">
+              You need to be logged in to use this feature. Would you like to login or create an account?
+            </p>
+            <div className="flex gap-4">
+              <Button
+                variant="default"
+                className="flex-1"
+                onClick={() => {
+                  setShowLoginPrompt(false)
+                  router.push("/auth")
+                }}
+              >
+                Login / Signup
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={() => setShowLoginPrompt(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )

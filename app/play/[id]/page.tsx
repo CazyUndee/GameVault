@@ -2,14 +2,15 @@
 
 import type React from "react"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Maximize2, Minimize2, ThumbsUp, ThumbsDown, Share2, ArrowLeft, MessageSquare } from "lucide-react"
+import { Maximize2, Minimize2, ThumbsUp, ThumbsDown, Share2, ArrowLeft, MessageSquare, Heart } from "lucide-react"
 import { playableGamesData } from "@/data/games"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 
 // Add these imports at the top
 import { getUserId } from "@/lib/user-id"
@@ -36,7 +37,11 @@ export default function PlayGame({ params }: { params: { id: string } }) {
   const [newComment, setNewComment] = useState("")
   const [userName, setUserName] = useState("")
   const [showComments, setShowComments] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+  const [pointsEarned, setPointsEarned] = useState(0)
+  const pointsInterval = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
+  const { user, addPoints, addFavorite, removeFavorite } = useAuth()
 
   const game = playableGamesData.find((game) => game.id === params.id)
 
@@ -91,6 +96,39 @@ export default function PlayGame({ params }: { params: { id: string } }) {
     loadRatings()
     loadComments()
   }, [game])
+
+  // Points system - earn points while playing
+  useEffect(() => {
+    // Only start earning points if user is logged in and game is not in fullscreen
+    if (user && !isFullscreen) {
+      // Clear any existing interval
+      if (pointsInterval.current) {
+        clearInterval(pointsInterval.current)
+      }
+
+      // Set up points earning (1 point per second)
+      let localPointsEarned = 0
+      pointsInterval.current = setInterval(() => {
+        localPointsEarned += 1
+        setPointsEarned((prev) => prev + 1)
+
+        // Every 10 seconds, update the user's points in the database
+        if (localPointsEarned % 10 === 0) {
+          addPoints(10)
+        }
+      }, 1000)
+
+      return () => {
+        if (pointsInterval.current) {
+          clearInterval(pointsInterval.current)
+          // Add any remaining points
+          if (localPointsEarned > 0) {
+            addPoints(localPointsEarned % 10)
+          }
+        }
+      }
+    }
+  }, [user, isFullscreen, addPoints])
 
   // Use useMemo to calculate styles instead of useState + useEffect
   const { iframeContainerStyle, iframeStyle } = useMemo(() => {
@@ -177,8 +215,30 @@ export default function PlayGame({ params }: { params: { id: string } }) {
     setIsFullscreen(!isFullscreen)
   }
 
+  // Check if user is favorited
+  const isFavorite = user ? user.favorites.includes(game.id) : false
+
+  // Handle favorite toggle
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (isFavorite) {
+      await removeFavorite(game.id)
+    } else {
+      await addFavorite(game.id)
+    }
+  }
+
   // Replace handleLike function
   const handleLike = async () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     if (!userRated && game) {
       const userId = getUserId()
 
@@ -206,6 +266,11 @@ export default function PlayGame({ params }: { params: { id: string } }) {
 
   // Replace handleDislike function
   const handleDislike = async () => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     if (!userRated && game) {
       const userId = getUserId()
 
@@ -251,7 +316,13 @@ export default function PlayGame({ params }: { params: { id: string } }) {
   // Replace handleSubmitComment function
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newComment.trim() || !userName.trim() || !game) return
+
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
+    if (!newComment.trim() || !game) return
 
     try {
       const response = await fetch("/api/comments", {
@@ -259,7 +330,7 @@ export default function PlayGame({ params }: { params: { id: string } }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contentId: game.id,
-          user: userName,
+          user: user.username,
           text: newComment,
         }),
       })
@@ -276,6 +347,11 @@ export default function PlayGame({ params }: { params: { id: string } }) {
 
   // Replace handleLikeComment function
   const handleLikeComment = async (commentId: string) => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     if (!game) return
 
     try {
@@ -300,6 +376,11 @@ export default function PlayGame({ params }: { params: { id: string } }) {
 
   // Replace handleDislikeComment function
   const handleDislikeComment = async (commentId: string) => {
+    if (!user) {
+      setShowLoginPrompt(true)
+      return
+    }
+
     if (!game) return
 
     try {
@@ -349,6 +430,12 @@ export default function PlayGame({ params }: { params: { id: string } }) {
             <span className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs rounded-md">
               {game.releaseYear}
             </span>
+
+            {user && (
+              <span className="px-2 py-1 bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-200 text-xs rounded-md flex items-center gap-1">
+                <span>+{pointsEarned} points earned</span>
+              </span>
+            )}
           </div>
 
           {/* Game iframe container with dynamic sizing */}
@@ -385,14 +472,41 @@ export default function PlayGame({ params }: { params: { id: string } }) {
             </div>
           </div>
 
+          {/* Login prompt modal */}
+          {showLoginPrompt && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg max-w-md w-full">
+                <h3 className="text-xl font-semibold mb-4">Login Required</h3>
+                <p className="mb-6">
+                  You need to be logged in to use this feature. Would you like to login or create an account?
+                </p>
+                <div className="flex gap-4">
+                  <Button
+                    variant="default"
+                    className="flex-1"
+                    onClick={() => {
+                      setShowLoginPrompt(false)
+                      router.push("/auth")
+                    }}
+                  >
+                    Login / Signup
+                  </Button>
+                  <Button variant="outline" className="flex-1" onClick={() => setShowLoginPrompt(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Game actions */}
           <div className="flex flex-wrap gap-4 mb-8">
             <Button
               variant="outline"
               size="sm"
-              className={`gap-2 ${userRated ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`gap-2 ${userRated && user ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={handleLike}
-              disabled={userRated || isLoading}
+              disabled={userRated && !!user}
             >
               <ThumbsUp className="w-4 h-4" />
               Like {likes > 0 && `(${likes})`}
@@ -400,9 +514,9 @@ export default function PlayGame({ params }: { params: { id: string } }) {
             <Button
               variant="outline"
               size="sm"
-              className={`gap-2 ${userRated ? "opacity-50 cursor-not-allowed" : ""}`}
+              className={`gap-2 ${userRated && user ? "opacity-50 cursor-not-allowed" : ""}`}
               onClick={handleDislike}
-              disabled={userRated || isLoading}
+              disabled={userRated && !!user}
             >
               <ThumbsDown className="w-4 h-4" />
               Dislike {dislikes > 0 && `(${dislikes})`}
@@ -410,6 +524,15 @@ export default function PlayGame({ params }: { params: { id: string } }) {
             <Button variant="outline" size="sm" className="gap-2" onClick={() => setShowComments(!showComments)}>
               <MessageSquare className="w-4 h-4" />
               Comments {comments.length > 0 && `(${comments.length})`}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className={`gap-2 ${isFavorite ? "text-red-500" : ""}`}
+              onClick={handleToggleFavorite}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? "fill-current" : ""}`} />
+              {isFavorite ? "Favorited" : "Favorite"}
             </Button>
             <Button variant="outline" size="sm" className="gap-2 ml-auto" onClick={handleShare}>
               <Share2 className="w-4 h-4" />
@@ -464,19 +587,6 @@ export default function PlayGame({ params }: { params: { id: string } }) {
 
               <form onSubmit={handleSubmitComment} className="space-y-4">
                 <div>
-                  <label htmlFor="userName" className="block text-sm font-medium mb-1">
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="userName"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-transparent"
-                    required
-                  />
-                </div>
-                <div>
                   <label htmlFor="comment" className="block text-sm font-medium mb-1">
                     Your Comment
                   </label>
@@ -487,9 +597,13 @@ export default function PlayGame({ params }: { params: { id: string } }) {
                     className="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-md bg-transparent"
                     rows={3}
                     required
+                    placeholder={user ? "Write your comment..." : "Login to comment"}
+                    disabled={!user}
                   />
                 </div>
-                <Button type="submit">Post Comment</Button>
+                <Button type="submit" disabled={!user}>
+                  {user ? "Post Comment" : "Login to Comment"}
+                </Button>
               </form>
             </div>
           )}

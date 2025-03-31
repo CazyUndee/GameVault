@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Settings, Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
@@ -11,11 +11,32 @@ export default function SettingsMenu() {
   const [customCSS, setCustomCSS] = useState("")
   const [colorScheme, setColorScheme] = useState("default")
   const [styleApplied, setStyleApplied] = useState(false)
+  const settingsRef = useRef<HTMLDivElement>(null)
 
   // Ensure theme component is mounted before accessing theme
   useEffect(() => {
-    setMounted(true)
+    // Set mounted to true after a short delay to ensure all styles are applied
+    const timer = setTimeout(() => {
+      setMounted(true)
+    }, 50)
+
+    return () => clearTimeout(timer)
   }, [])
+
+  // Force a repaint of the settings panel when it's opened
+  useEffect(() => {
+    if (isOpen && settingsRef.current) {
+      // Force a repaint by accessing offsetHeight
+      const height = settingsRef.current.offsetHeight
+      // Apply a small style change to trigger a repaint
+      settingsRef.current.style.opacity = "0.99"
+      setTimeout(() => {
+        if (settingsRef.current) {
+          settingsRef.current.style.opacity = "1"
+        }
+      }, 10)
+    }
+  }, [isOpen])
 
   // Apply custom CSS
   useEffect(() => {
@@ -186,35 +207,37 @@ export default function SettingsMenu() {
 
         {/* Settings panel */}
         <div
+          ref={settingsRef}
           className={`absolute bottom-16 right-0 w-80 bg-white dark:bg-zinc-900 rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-800 transition-all duration-300 overflow-hidden ${
             isOpen ? "opacity-100 translate-y-0 max-h-[80vh]" : "opacity-0 translate-y-4 max-h-0 pointer-events-none"
           }`}
+          style={{ visibility: isOpen ? "visible" : "hidden" }}
         >
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-            <h3 className="text-lg font-semibold">Settings</h3>
+            <h3 className="text-lg font-semibold text-black dark:text-white">Settings</h3>
           </div>
 
           <div className="p-4 space-y-6 max-h-[calc(80vh-60px)] overflow-y-auto">
             {/* Theme toggle */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">Theme</h4>
+            <div className="settings-section">
+              <h4 className="text-sm font-medium mb-2 text-black dark:text-white">Theme</h4>
               <div className="flex items-center gap-2">
                 <button
-                  className={`flex items-center justify-center w-10 h-10 rounded-md ${theme === "light" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-zinc-100 dark:bg-zinc-800"}`}
+                  className={`flex items-center justify-center w-10 h-10 rounded-md ${theme === "light" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-zinc-100 dark:bg-zinc-800"} text-black dark:text-white`}
                   onClick={() => setTheme("light")}
                   aria-label="Light theme"
                 >
                   <Sun className="w-5 h-5" />
                 </button>
                 <button
-                  className={`flex items-center justify-center w-10 h-10 rounded-md ${theme === "dark" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-zinc-100 dark:bg-zinc-800"}`}
+                  className={`flex items-center justify-center w-10 h-10 rounded-md ${theme === "dark" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-zinc-100 dark:bg-zinc-800"} text-black dark:text-white`}
                   onClick={() => setTheme("dark")}
                   aria-label="Dark theme"
                 >
                   <Moon className="w-5 h-5" />
                 </button>
                 <button
-                  className={`flex items-center justify-center w-10 h-10 rounded-md ${theme === "system" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-zinc-100 dark:bg-zinc-800"}`}
+                  className={`flex items-center justify-center w-10 h-10 rounded-md ${theme === "system" ? "bg-zinc-200 dark:bg-zinc-700" : "bg-zinc-100 dark:bg-zinc-800"} text-black dark:text-white`}
                   onClick={() => setTheme("system")}
                   aria-label="System theme"
                 >
@@ -224,8 +247,8 @@ export default function SettingsMenu() {
             </div>
 
             {/* Color schemes */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">Color Scheme</h4>
+            <div className="settings-section">
+              <h4 className="text-sm font-medium mb-2 text-black dark:text-white">Color Scheme</h4>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "default" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
@@ -233,7 +256,7 @@ export default function SettingsMenu() {
                   style={{ background: "linear-gradient(to right, #f8fafc, #1e293b)" }}
                   aria-label="Default color scheme"
                 >
-                  <span className="text-xs font-medium">Default</span>
+                  <span className="text-xs font-medium text-black">Default</span>
                 </button>
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "blue" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
@@ -241,7 +264,7 @@ export default function SettingsMenu() {
                   style={{ background: "linear-gradient(to right, #eff6ff, #1e40af)" }}
                   aria-label="Blue color scheme"
                 >
-                  <span className="text-xs font-medium">Blue</span>
+                  <span className="text-xs font-medium text-black">Blue</span>
                 </button>
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "green" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
@@ -249,7 +272,7 @@ export default function SettingsMenu() {
                   style={{ background: "linear-gradient(to right, #f0fdf4, #166534)" }}
                   aria-label="Green color scheme"
                 >
-                  <span className="text-xs font-medium">Green</span>
+                  <span className="text-xs font-medium text-black">Green</span>
                 </button>
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "purple" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
@@ -257,7 +280,7 @@ export default function SettingsMenu() {
                   style={{ background: "linear-gradient(to right, #faf5ff, #7e22ce)" }}
                   aria-label="Purple color scheme"
                 >
-                  <span className="text-xs font-medium">Purple</span>
+                  <span className="text-xs font-medium text-black">Purple</span>
                 </button>
                 <button
                   className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "dark-blue" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
@@ -279,23 +302,23 @@ export default function SettingsMenu() {
             </div>
 
             {/* Custom CSS */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">Custom CSS (Advanced)</h4>
+            <div className="settings-section">
+              <h4 className="text-sm font-medium mb-2 text-black dark:text-white">Custom CSS (Advanced)</h4>
               <textarea
-                className="w-full h-32 p-2 text-sm font-mono border border-zinc-300 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-800"
+                className="w-full h-32 p-2 text-sm font-mono border border-zinc-300 dark:border-zinc-700 rounded-md bg-zinc-50 dark:bg-zinc-800 text-black dark:text-white"
                 value={customCSS}
                 onChange={(e) => setCustomCSS(e.target.value)}
                 placeholder=":root { --custom-color: #ff0000; } .my-class { color: var(--custom-color); }"
               />
               <div className="flex gap-2 mt-2">
                 <button
-                  className="px-3 py-1 text-sm bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-md"
+                  className="px-3 py-1 text-sm bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-md settings-apply-button"
                   onClick={handleApplyCSS}
                 >
                   Apply
                 </button>
                 <button
-                  className="px-3 py-1 text-sm border border-zinc-300 dark:border-zinc-700 rounded-md"
+                  className="px-3 py-1 text-sm border border-zinc-300 dark:border-zinc-700 rounded-md text-black dark:text-white settings-reset-button"
                   onClick={handleResetCSS}
                 >
                   Reset
