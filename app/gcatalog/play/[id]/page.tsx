@@ -97,7 +97,7 @@ export default function PlayGame({ params }: { params: { id: string } }) {
     loadComments()
   }, [game])
 
-  // Points system - earn points while playing
+  // Update the points system to ensure points are properly synced
   useEffect(() => {
     // Only start earning points if user is logged in and game is not in fullscreen
     if (user && !isFullscreen) {
@@ -112,9 +112,10 @@ export default function PlayGame({ params }: { params: { id: string } }) {
         localPointsEarned += 1
         setPointsEarned((prev) => prev + 1)
 
-        // Every 10 seconds, update the user's points in the database
-        if (localPointsEarned % 10 === 0) {
-          addPoints(10)
+        // Every 5 seconds, update the user's points in the database
+        if (localPointsEarned % 5 === 0) {
+          addPoints(5)
+          console.log("Points added:", 5)
         }
       }, 1000)
 
@@ -122,8 +123,10 @@ export default function PlayGame({ params }: { params: { id: string } }) {
         if (pointsInterval.current) {
           clearInterval(pointsInterval.current)
           // Add any remaining points
-          if (localPointsEarned > 0) {
-            addPoints(localPointsEarned % 10)
+          if (localPointsEarned % 5 > 0) {
+            const remainingPoints = localPointsEarned % 5
+            addPoints(remainingPoints)
+            console.log("Remaining points added:", remainingPoints)
           }
         }
       }

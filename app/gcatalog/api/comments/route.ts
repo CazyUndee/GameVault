@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getComments, addComment, updateCommentLikes, type Comment } from "@/lib/kv"
+import { getComments, addComment, updateCommentRating, type Comment } from "@/lib/kv"
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { contentId, user, text } = await request.json()
+    const { contentId, user, text, parentId } = await request.json()
 
     if (!contentId || !user || !text) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -32,6 +32,7 @@ export async function POST(request: NextRequest) {
       date: new Date().toISOString(),
       likes: 0,
       dislikes: 0,
+      parentId,
     }
 
     await addComment(contentId, newComment)
@@ -46,18 +47,24 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { contentId, commentId, action } = await request.json()
+    const { contentId, commentId, userId, action } = await request.json()
 
-    if (!contentId || !commentId || !action) {
+    if (!contentId || !commentId || !userId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    if (action !== "like" && action !== "dislike") {
+    // Determine the new rating action
+    let newAction: "like" | "dislike" | null = null
+
+    if (action === "like" || action === "dislike") {
+      newAction = action
+    } else if (action === "unlike" || action === "undislike") {
+      newAction = null
+    } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 })
     }
 
-    await updateCommentLikes(contentId, commentId, action)
-    const updatedComments = await getComments(contentId)
+    const updatedComments = await updateCommentRating(contentId, commentId, userId, newAction)
 
     return NextResponse.json({ success: true, comments: updatedComments })
   } catch (error) {

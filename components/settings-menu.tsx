@@ -15,12 +15,7 @@ export default function SettingsMenu() {
 
   // Ensure theme component is mounted before accessing theme
   useEffect(() => {
-    // Set mounted to true after a short delay to ensure all styles are applied
-    const timer = setTimeout(() => {
-      setMounted(true)
-    }, 50)
-
-    return () => clearTimeout(timer)
+    setMounted(true)
   }, [])
 
   // Force a repaint of the settings panel when it's opened
@@ -64,97 +59,230 @@ export default function SettingsMenu() {
     if (!mounted) return
 
     const root = document.documentElement
-
-    switch (colorScheme) {
-      case "blue":
-        // Blue theme - actual blue colors
-        root.style.setProperty("--foreground", "23, 37, 84") // blue-900
-        root.style.setProperty("--background", "239, 246, 255") // blue-50
-        root.style.setProperty("--primary", "37, 99, 235") // blue-600
-        root.style.setProperty("--primary-foreground", "255, 255, 255") // white
-        root.style.setProperty("--secondary", "191, 219, 254") // blue-200
-        root.style.setProperty("--secondary-foreground", "30, 58, 138") // blue-800
-        document.body.classList.remove("dark")
-        setTheme("light")
-        break
-
-      case "green":
-        // Green theme - actual green colors
-        root.style.setProperty("--foreground", "6, 78, 59") // green-800
-        root.style.setProperty("--background", "240, 253, 244") // green-50
-        root.style.setProperty("--primary", "16, 185, 129") // green-600
-        root.style.setProperty("--primary-foreground", "255, 255, 255") // white
-        root.style.setProperty("--secondary", "187, 247, 208") // green-200
-        root.style.setProperty("--secondary-foreground", "6, 78, 59") // green-800
-        document.body.classList.remove("dark")
-        setTheme("light")
-        break
-
-      case "purple":
-        // Purple theme - actual purple colors
-        root.style.setProperty("--foreground", "76, 29, 149") // purple-900
-        root.style.setProperty("--background", "250, 245, 255") // purple-50
-        root.style.setProperty("--primary", "147, 51, 234") // purple-600
-        root.style.setProperty("--primary-foreground", "255, 255, 255") // white
-        root.style.setProperty("--secondary", "233, 213, 255") // purple-200
-        root.style.setProperty("--secondary-foreground", "88, 28, 135") // purple-800
-        document.body.classList.remove("dark")
-        setTheme("light")
-        break
-
-      case "dark-blue":
-        // Dark blue theme - actual dark blue colors
-        root.style.setProperty("--foreground", "219, 234, 254") // blue-100
-        root.style.setProperty("--background", "30, 58, 138") // blue-900
-        root.style.setProperty("--primary", "96, 165, 250") // blue-400
-        root.style.setProperty("--primary-foreground", "30, 58, 138") // blue-900
-        root.style.setProperty("--secondary", "37, 99, 235") // blue-600
-        root.style.setProperty("--secondary-foreground", "239, 246, 255") // blue-50
-        document.body.classList.add("dark")
-        setTheme("dark")
-        break
-
-      case "dark-green":
-        // Dark green theme - actual dark green colors
-        root.style.setProperty("--foreground", "220, 252, 231") // green-100
-        root.style.setProperty("--background", "6, 78, 59") // green-900
-        root.style.setProperty("--primary", "34, 197, 94") // green-500
-        root.style.setProperty("--primary-foreground", "6, 78, 59") // green-900
-        root.style.setProperty("--secondary", "16, 185, 129") // green-600
-        root.style.setProperty("--secondary-foreground", "240, 253, 244") // green-50
-        document.body.classList.add("dark")
-        setTheme("dark")
-        break
-
-      case "dark-purple":
-        // Dark purple theme - actual dark purple colors
-        root.style.setProperty("--foreground", "243, 232, 255") // purple-100
-        root.style.setProperty("--background", "76, 29, 149") // purple-900
-        root.style.setProperty("--primary", "192, 132, 252") // purple-400
-        root.style.setProperty("--primary-foreground", "76, 29, 149") // purple-900
-        root.style.setProperty("--secondary", "147, 51, 234") // purple-600
-        root.style.setProperty("--secondary-foreground", "250, 245, 255") // purple-50
-        document.body.classList.add("dark")
-        setTheme("dark")
-        break
-
-      default:
-        // Reset to default
-        root.style.removeProperty("--foreground")
-        root.style.removeProperty("--background")
-        root.style.removeProperty("--primary")
-        root.style.removeProperty("--primary-foreground")
-        root.style.removeProperty("--secondary")
-        root.style.removeProperty("--secondary-foreground")
-
-        if (theme === "dark") {
-          root.style.setProperty("--foreground", "244, 244, 245") // zinc-100
-          root.style.setProperty("--background", "24, 24, 27") // zinc-900
-        } else {
-          root.style.setProperty("--foreground", "24, 24, 27") // zinc-900
-          root.style.setProperty("--background", "255, 255, 255") // white
-        }
+    const colorSchemes = {
+      default: {
+        light: {
+          foreground: "24, 24, 27", // zinc-900
+          background: "255, 255, 255", // white
+          primary: "24, 24, 27", // zinc-900
+          "primary-foreground": "255, 255, 255", // white
+          secondary: "244, 244, 245", // zinc-100
+          "secondary-foreground": "24, 24, 27", // zinc-900
+          accent: "37, 99, 235", // blue-600
+          "accent-foreground": "255, 255, 255", // white
+          muted: "244, 244, 245", // zinc-100
+          "muted-foreground": "113, 113, 122", // zinc-500
+          border: "228, 228, 231", // zinc-200
+          input: "228, 228, 231", // zinc-200
+          ring: "24, 24, 27", // zinc-900
+          card: "255, 255, 255", // white
+          "card-foreground": "24, 24, 27", // zinc-900
+          popover: "255, 255, 255", // white
+          "popover-foreground": "24, 24, 27", // zinc-900
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+        dark: {
+          foreground: "244, 244, 245", // zinc-100
+          background: "24, 24, 27", // zinc-900
+          primary: "244, 244, 245", // zinc-100
+          "primary-foreground": "24, 24, 27", // zinc-900
+          secondary: "39, 39, 42", // zinc-800
+          "secondary-foreground": "244, 244, 245", // zinc-100
+          accent: "96, 165, 250", // blue-400
+          "accent-foreground": "24, 24, 27", // zinc-900
+          muted: "39, 39, 42", // zinc-800
+          "muted-foreground": "161, 161, 170", // zinc-400
+          border: "63, 63, 70", // zinc-700
+          input: "63, 63, 70", // zinc-700
+          ring: "244, 244, 245", // zinc-100
+          card: "39, 39, 42", // zinc-800
+          "card-foreground": "244, 244, 245", // zinc-100
+          popover: "39, 39, 42", // zinc-800
+          "popover-foreground": "244, 244, 245", // zinc-100
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+      },
+      blue: {
+        light: {
+          foreground: "23, 37, 84", // blue-900
+          background: "239, 246, 255", // blue-50
+          primary: "37, 99, 235", // blue-600
+          "primary-foreground": "255, 255, 255", // white
+          secondary: "191, 219, 254", // blue-200
+          "secondary-foreground": "30, 58, 138", // blue-800
+          accent: "59, 130, 246", // blue-500
+          "accent-foreground": "255, 255, 255", // white
+          muted: "219, 234, 254", // blue-100
+          "muted-foreground": "30, 58, 138", // blue-800
+          border: "191, 219, 254", // blue-200
+          input: "191, 219, 254", // blue-200
+          ring: "37, 99, 235", // blue-600
+          card: "255, 255, 255", // white
+          "card-foreground": "23, 37, 84", // blue-900
+          popover: "255, 255, 255", // white
+          "popover-foreground": "23, 37, 84", // blue-900
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+        dark: {
+          foreground: "219, 234, 254", // blue-100
+          background: "30, 58, 138", // blue-900
+          primary: "96, 165, 250", // blue-400
+          "primary-foreground": "30, 58, 138", // blue-900
+          secondary: "37, 99, 235", // blue-600
+          "secondary-foreground": "239, 246, 255", // blue-50
+          accent: "59, 130, 246", // blue-500
+          "accent-foreground": "255, 255, 255", // white
+          muted: "30, 64, 175", // blue-800
+          "muted-foreground": "191, 219, 254", // blue-200
+          border: "30, 64, 175", // blue-800
+          input: "30, 64, 175", // blue-800
+          ring: "96, 165, 250", // blue-400
+          card: "30, 64, 175", // blue-800
+          "card-foreground": "219, 234, 254", // blue-100
+          popover: "30, 64, 175", // blue-800
+          "popover-foreground": "219, 234, 254", // blue-100
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+      },
+      green: {
+        light: {
+          foreground: "6, 78, 59", // green-800
+          background: "240, 253, 244", // green-50
+          primary: "16, 185, 129", // green-600
+          "primary-foreground": "255, 255, 255", // white
+          secondary: "187, 247, 208", // green-200
+          "secondary-foreground": "6, 78, 59", // green-800
+          accent: "34, 197, 94", // green-500
+          "accent-foreground": "255, 255, 255", // white
+          muted: "220, 252, 231", // green-100
+          "muted-foreground": "6, 78, 59", // green-800
+          border: "187, 247, 208", // green-200
+          input: "187, 247, 208", // green-200
+          ring: "16, 185, 129", // green-600
+          card: "255, 255, 255", // white
+          "card-foreground": "6, 78, 59", // green-800
+          popover: "255, 255, 255", // white
+          "popover-foreground": "6, 78, 59", // green-800
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+        dark: {
+          foreground: "220, 252, 231", // green-100
+          background: "6, 78, 59", // green-900
+          primary: "34, 197, 94", // green-500
+          "primary-foreground": "6, 78, 59", // green-900
+          secondary: "16, 185, 129", // green-600
+          "secondary-foreground": "240, 253, 244", // green-50
+          accent: "34, 197, 94", // green-500
+          "accent-foreground": "255, 255, 255", // white
+          muted: "5, 150, 105", // green-700
+          "muted-foreground": "187, 247, 208", // green-200
+          border: "5, 150, 105", // green-700
+          input: "5, 150, 105", // green-700
+          ring: "34, 197, 94", // green-500
+          card: "5, 150, 105", // green-700
+          "card-foreground": "220, 252, 231", // green-100
+          popover: "5, 150, 105", // green-700
+          "popover-foreground": "220, 252, 231", // green-100
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+      },
+      purple: {
+        light: {
+          foreground: "76, 29, 149", // purple-900
+          background: "250, 245, 255", // purple-50
+          primary: "147, 51, 234", // purple-600
+          "primary-foreground": "255, 255, 255", // white
+          secondary: "233, 213, 255", // purple-200
+          "secondary-foreground": "88, 28, 135", // purple-800
+          accent: "168, 85, 247", // purple-500
+          "accent-foreground": "255, 255, 255", // white
+          muted: "243, 232, 255", // purple-100
+          "muted-foreground": "88, 28, 135", // purple-800
+          border: "233, 213, 255", // purple-200
+          input: "233, 213, 255", // purple-200
+          ring: "147, 51, 234", // purple-600
+          card: "255, 255, 255", // white
+          "card-foreground": "76, 29, 149", // purple-900
+          popover: "255, 255, 255", // white
+          "popover-foreground": "76, 29, 149", // purple-900
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+        dark: {
+          foreground: "243, 232, 255", // purple-100
+          background: "76, 29, 149", // purple-900
+          primary: "192, 132, 252", // purple-400
+          "primary-foreground": "76, 29, 149", // purple-900
+          secondary: "147, 51, 234", // purple-600
+          "secondary-foreground": "250, 245, 255", // purple-50
+          accent: "168, 85, 247", // purple-500
+          "accent-foreground": "255, 255, 255", // white
+          muted: "107, 33, 168", // purple-800
+          "muted-foreground": "233, 213, 255", // purple-200
+          border: "107, 33, 168", // purple-800
+          input: "107, 33, 168", // purple-800
+          ring: "192, 132, 252", // purple-400
+          card: "107, 33, 168", // purple-800
+          "card-foreground": "243, 232, 255", // purple-100
+          popover: "107, 33, 168", // purple-800
+          "popover-foreground": "243, 232, 255", // purple-100
+          destructive: "239, 68, 68", // red-500
+          "destructive-foreground": "255, 255, 255", // white
+        },
+      },
     }
+
+    // Get the current theme mode
+    const isDark = theme === "dark"
+
+    // Get the color scheme
+    let selectedScheme
+    if (colorScheme === "default") {
+      selectedScheme = colorSchemes.default
+    } else if (colorScheme === "blue" || colorScheme === "dark-blue") {
+      selectedScheme = colorSchemes.blue
+      if (colorScheme === "dark-blue") {
+        document.documentElement.classList.add("dark")
+        setTheme("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+        setTheme("light")
+      }
+    } else if (colorScheme === "green" || colorScheme === "dark-green") {
+      selectedScheme = colorSchemes.green
+      if (colorScheme === "dark-green") {
+        document.documentElement.classList.add("dark")
+        setTheme("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+        setTheme("light")
+      }
+    } else if (colorScheme === "purple" || colorScheme === "dark-purple") {
+      selectedScheme = colorSchemes.purple
+      if (colorScheme === "dark-purple") {
+        document.documentElement.classList.add("dark")
+        setTheme("dark")
+      } else {
+        document.documentElement.classList.remove("dark")
+        setTheme("light")
+      }
+    } else {
+      selectedScheme = colorSchemes.default
+    }
+
+    // Apply the selected color scheme
+    const colors = isDark ? selectedScheme.dark : selectedScheme.light
+
+    // Apply all colors to CSS variables
+    Object.entries(colors).forEach(([key, value]) => {
+      root.style.setProperty(`--${key}`, value)
+    })
   }, [colorScheme, mounted, theme, setTheme])
 
   // Toggle settings menu
@@ -297,6 +425,14 @@ export default function SettingsMenu() {
                   aria-label="Dark green color scheme"
                 >
                   <span className="text-xs font-medium text-white">Dark Green</span>
+                </button>
+                <button
+                  className={`flex items-center justify-center w-full h-10 rounded-md ${colorScheme === "dark-purple" ? "ring-2 ring-zinc-900 dark:ring-white" : ""}`}
+                  onClick={() => setColorScheme("dark-purple")}
+                  style={{ background: "linear-gradient(to right, #581c87, #e9d5ff)" }}
+                  aria-label="Dark purple color scheme"
+                >
+                  <span className="text-xs font-medium text-white">Dark Purple</span>
                 </button>
               </div>
             </div>

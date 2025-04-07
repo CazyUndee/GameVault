@@ -1,131 +1,42 @@
 "use client"
 
-import type React from "react"
+import { useState, useEffect } from "react"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import Link from "next/link"
 import Image from "next/image"
-import { gamesData, playableGamesData } from "@/data/games"
 import { useAuth } from "@/contexts/auth-context"
-import { ChevronLeft, ChevronRight, Lock } from "lucide-react"
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
+import { ArrowRight, Database, Search, Bot, PenToolIcon as Tool, Trophy, Sparkles } from "lucide-react"
 
-export default function Home() {
+export default function HomePage() {
   const { user } = useAuth()
-  const [currentFeaturedIndex, setCurrentFeaturedIndex] = useState(0)
-  const [currentPlayableIndex, setCurrentPlayableIndex] = useState(0)
-  const [currentSpecialIndex, setCurrentSpecialIndex] = useState(0)
+  const [isLoaded, setIsLoaded] = useState(false)
 
-  const featuredScrollRef = useRef<HTMLDivElement>(null)
-  const playableScrollRef = useRef<HTMLDivElement>(null)
-  const specialScrollRef = useRef<HTMLDivElement>(null)
+  // Add animation on load
+  useEffect(() => {
+    setIsLoaded(true)
 
-  // Get top rated games for featured section
-  const featuredGames = [...gamesData].sort((a, b) => b.rating - a.rating).slice(0, 8)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed")
+          }
+        })
+      },
+      { threshold: 0.1 },
+    )
 
-  // Get all unique genres from games
-  const allGenres = Array.from(new Set(gamesData.flatMap((game) => game.genres)))
+    document.querySelectorAll(".scroll-reveal").forEach((el) => {
+      observer.observe(el)
+    })
 
-  // Count games for each genre
-  const categoryCounts = allGenres.reduce(
-    (acc, genre) => {
-      acc[genre] = gamesData.filter((game) => game.genres.includes(genre)).length
-      return acc
-    },
-    {} as Record<string, number>,
-  )
-
-  // Get top categories by count
-  const topCategories = Object.entries(categoryCounts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([name, count]) => ({ name, count }))
-
-  // Special games that unlock at different point levels
-  const specialGames = [
-    {
-      id: "special1",
-      title: "Elite Racer",
-      description: "A high-speed racing game with stunning graphics",
-      image: "/placeholder.svg?height=300&width=500",
-      pointsRequired: 300,
-    },
-    {
-      id: "special2",
-      title: "Cosmic Explorer",
-      description: "Explore the vastness of space in this adventure game",
-      image: "/placeholder.svg?height=300&width=500",
-      pointsRequired: 300,
-    },
-    {
-      id: "special3",
-      title: "Dungeon Master",
-      description: "Create and conquer dungeons in this strategy game",
-      image: "/placeholder.svg?height=300&width=500",
-      pointsRequired: 1000,
-    },
-    {
-      id: "special4",
-      title: "Pirate's Treasure",
-      description: "Sail the high seas in search of legendary treasures",
-      image: "/placeholder.svg?height=300&width=500",
-      pointsRequired: 1000,
-    },
-    {
-      id: "special5",
-      title: "Zombie Apocalypse",
-      description: "Survive the zombie outbreak in this horror action game",
-      image: "/placeholder.svg?height=300&width=500",
-      pointsRequired: 3000,
-    },
-    {
-      id: "special6",
-      title: "Fantasy Kingdom",
-      description: "Build your own fantasy kingdom and defend it from invaders",
-      image: "/placeholder.svg?height=300&width=500",
-      pointsRequired: 3000,
-    },
-  ]
-
-  // Navigation functions for featured games
-  const scrollFeaturedLeft = () => {
-    if (currentFeaturedIndex > 0) {
-      setCurrentFeaturedIndex(currentFeaturedIndex - 1)
+    return () => {
+      document.querySelectorAll(".scroll-reveal").forEach((el) => {
+        observer.unobserve(el)
+      })
     }
-  }
-
-  const scrollFeaturedRight = () => {
-    if (currentFeaturedIndex < featuredGames.length - 4) {
-      setCurrentFeaturedIndex(currentFeaturedIndex + 1)
-    }
-  }
-
-  // Navigation functions for playable games
-  const scrollPlayableLeft = () => {
-    if (currentPlayableIndex > 0) {
-      setCurrentPlayableIndex(currentPlayableIndex - 1)
-    }
-  }
-
-  const scrollPlayableRight = () => {
-    if (currentPlayableIndex < playableGamesData.length - 4) {
-      setCurrentPlayableIndex(currentPlayableIndex + 1)
-    }
-  }
-
-  // Navigation functions for special games
-  const scrollSpecialLeft = () => {
-    if (currentSpecialIndex > 0) {
-      setCurrentSpecialIndex(currentSpecialIndex - 1)
-    }
-  }
-
-  const scrollSpecialRight = () => {
-    if (currentSpecialIndex < specialGames.length - 4) {
-      setCurrentSpecialIndex(currentSpecialIndex + 1)
-    }
-  }
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -133,346 +44,346 @@ export default function Home() {
 
       <main className="flex-1 px-4 md:px-6 py-12 md:py-20">
         {/* Hero Section */}
-        <section className="max-w-5xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <div className="max-w-3xl">
-              <h1 className="mb-6">
-                Discover Your Next Favorite Game
-                {user && <span>, {user.username}</span>}
-              </h1>
-              <p className="text-xl mb-8 text-zinc-700 dark:text-zinc-300">
-                A minimalist catalog of carefully curated games across all platforms and genres.
-              </p>
-            </div>
+        <section
+          className={`content-container-wide mx-auto transition-opacity duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+        >
+          <div className="flex flex-col items-start mb-10">
+            <h1 className="mb-2 flex items-center">
+              Welcome to GameVaultX
+              {user && <span className="ml-2">, {user.displayName || user.username}</span>}
+              <Sparkles className="ml-2 h-8 w-8 text-purple-500" />
+            </h1>
 
             {user && (
-              <div className="points-display text-lg">
+              <div className="points-display text-lg mt-2">
+                <Trophy size={18} className="text-purple-500" />
                 <span className="font-bold">{user.points}</span> points
               </div>
             )}
+
+            <p className="text-xl mt-4 mb-8 text-zinc-700 dark:text-zinc-300">
+              Your complete gaming ecosystem with tools, catalogs, AI features, and more.
+            </p>
           </div>
 
           <div className="flex flex-wrap gap-4">
             <Link
-              href="/games"
-              className="px-6 py-3 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-md no-underline hover:opacity-90 transition-opacity"
+              href="/gcatalog"
+              className="px-6 py-3 bg-purple-600 text-white rounded-md no-underline hover:bg-purple-700 transition-colors"
             >
-              Browse Games
+              Explore GCatalog
             </Link>
             <Link
-              href="/play"
+              href="/vault-ai"
               className="px-6 py-3 border border-zinc-300 dark:border-zinc-700 rounded-md no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
-              Play Now
+              Try Vault AI
             </Link>
             {user && (
               <Link
-                href="/favorites"
+                href="/vault-tools"
                 className="px-6 py-3 border border-zinc-300 dark:border-zinc-700 rounded-md no-underline hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               >
-                My Favorites
+                Vault Tools
               </Link>
             )}
           </div>
         </section>
 
-        {/* Points and Leaderboard Section - Only shown to logged in users */}
-        {user && (
-          <section className="max-w-5xl mx-auto mt-16">
-            <h2 className="mb-8">Your Gaming Progress</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-                <h3 className="text-xl mb-4">Your Points</h3>
-                <div className="flex items-center gap-4">
-                  <div className="text-4xl font-bold">{user.points}</div>
-                  <div className="text-zinc-600 dark:text-zinc-400">
-                    <p>Play more games to earn points!</p>
-                    <p className="text-sm mt-1">Unlock new games at 300, 1000, and 3000 points</p>
-                  </div>
+        {/* Ecosystem Overview */}
+        <section className="content-container-wide mx-auto mt-20 scroll-reveal">
+          <h2 className="mb-10 text-center">The GameVaultX Ecosystem</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* GCatalog Card */}
+            <Link href="/gcatalog" className="group">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
+                <div className="flex items-center mb-4">
+                  <Database className="h-8 w-8 text-purple-600 mr-3" />
+                  <h2 className="text-2xl font-bold">GCatalog</h2>
                 </div>
-                <div className="mt-4">
-                  <Link href="/leaderboard" className="text-sm font-medium">
-                    View Leaderboard →
-                  </Link>
-                </div>
-              </div>
-
-              <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-                <h3 className="text-xl mb-4">Your Favorites</h3>
-                {user.favorites.length > 0 ? (
-                  <div className="space-y-2">
-                    {user.favorites.slice(0, 3).map((gameId) => {
-                      const game = [...gamesData, ...playableGamesData].find((g) => g.id === gameId)
-                      if (!game) return null
-
-                      return (
-                        <div key={gameId} className="flex justify-between items-center">
-                          <span>{game.title}</span>
-                          <Link
-                            href={game.category ? `/play/${game.id}` : `/games/${game.id}`}
-                            className="text-xs font-medium"
-                          >
-                            View →
-                          </Link>
-                        </div>
-                      )
-                    })}
-                    {user.favorites.length > 3 && (
-                      <div className="mt-2 text-center">
-                        <Link href="/favorites" className="text-sm font-medium">
-                          View All Favorites →
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-zinc-600 dark:text-zinc-400">
-                    You haven't added any favorites yet. Browse games and click the heart icon to add them!
-                  </p>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* Special Games Section - Only shown to logged in users */}
-        {user && (
-          <section className="max-w-5xl mx-auto mt-16">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="mb-0">Special Games</h2>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" onClick={scrollSpecialLeft} disabled={currentSpecialIndex === 0}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={scrollSpecialRight}
-                  disabled={currentSpecialIndex >= specialGames.length - 4}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div ref={specialScrollRef} className="flex gap-4 overflow-hidden" style={{ scrollBehavior: "smooth" }}>
-              {specialGames.slice(currentSpecialIndex, currentSpecialIndex + 4).map((game) => (
-                <div
-                  key={game.id}
-                  className="flex-none w-full sm:w-1/2 md:w-1/3 lg:w-1/4 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden"
-                >
-                  <div className="aspect-video relative">
-                    <Image src={game.image || "/placeholder.svg"} alt={game.title} fill className="object-cover" />
-                    {user.points < game.pointsRequired && (
-                      <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white">
-                        <Lock className="h-8 w-8 mb-2" />
-                        <p className="text-sm font-medium">Locked</p>
-                        <p className="text-xs">{game.pointsRequired - user.points} points to unlock</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="mb-1">{game.title}</h3>
-                    <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-2">{game.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                        Requires {game.pointsRequired} points
-                      </span>
-                      {user.points >= game.pointsRequired ? (
-                        <Button size="sm" variant="outline">
-                          Play Now
-                        </Button>
-                      ) : (
-                        <Button size="sm" variant="outline" disabled>
-                          Locked
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Featured Games Section */}
-        <section className="max-w-5xl mx-auto mt-16">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="mb-0">Featured Games</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={scrollFeaturedLeft} disabled={currentFeaturedIndex === 0}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={scrollFeaturedRight}
-                disabled={currentFeaturedIndex >= featuredGames.length - 4}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div ref={featuredScrollRef} className="flex gap-4 overflow-hidden" style={{ scrollBehavior: "smooth" }}>
-            {featuredGames.slice(currentFeaturedIndex, currentFeaturedIndex + 4).map((game) => (
-              <div
-                key={game.id}
-                className="flex-none w-full sm:w-1/2 md:w-1/3 lg:w-1/4 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="aspect-video relative">
-                  <Image src={game.image || "/placeholder.svg"} alt={game.title} fill className="object-cover" />
-                </div>
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="mb-0 text-base">{game.title}</h3>
-                    <div className="px-2 py-1 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-medium rounded-md">
-                      {game.rating}/10
-                    </div>
-                  </div>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-2 line-clamp-2">{game.description}</p>
-
-                  {/* Display all tags/genres */}
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {game.genres.slice(0, 2).map((genre) => (
-                      <span
-                        key={genre}
-                        className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs rounded-md"
-                      >
-                        {genre}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <Link href={`/games/${game.id}`} className="text-sm font-medium">
-                      View Details →
-                    </Link>
-                    {user && <FavoriteButton gameId={game.id} />}
-                  </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Comprehensive game database with detailed metadata, tagging system, and community-driven mod
+                  recommendations.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Detailed game metadata and developer insights</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Advanced tagging system for precise categorization</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Custom user lists for organization</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Community-driven mod recommendations</span>
+                  </li>
+                </ul>
+                <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                  Explore GCatalog
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="mt-4 text-center">
-            <Link href="/games" className="inline-flex items-center text-sm font-medium">
-              View All Games →
+            </Link>
+
+            {/* Vault Search Card */}
+            <Link href="/vault-search" className="group">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
+                <div className="flex items-center mb-4">
+                  <Search className="h-8 w-8 text-purple-600 mr-3" />
+                  <h2 className="text-2xl font-bold">Vault Search</h2>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  AI-powered game discovery engine with cross-platform tracking and specialized filters for niche
+                  categories.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>AI-powered recommendations based on play history</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Cross-platform game availability tracking</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Niche category filters for specialized discovery</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>System compatibility matching</span>
+                  </li>
+                </ul>
+                <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                  Explore Vault Search
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </Link>
+
+            {/* Vault AI Card */}
+            <Link href="/vault-ai" className="group">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
+                <div className="flex items-center mb-4">
+                  <Bot className="h-8 w-8 text-purple-600 mr-3" />
+                  <h2 className="text-2xl font-bold">Vault AI</h2>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Experimental AI sandbox for NPC behavior modeling, lore generation, and procedural content creation.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>AI-driven NPC behavior models</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Chatbot-powered lore generators</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Procedural generation tools</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>AI response optimization</span>
+                  </li>
+                </ul>
+                <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                  Explore Vault AI
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
+            </Link>
+
+            {/* Vault Tools Card */}
+            <Link href="/vault-tools" className="group">
+              <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
+                <div className="flex items-center mb-4">
+                  <Tool className="h-8 w-8 text-purple-600 mr-3" />
+                  <h2 className="text-2xl font-bold">Vault Tools</h2>
+                </div>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Performance benchmarking, modding frameworks, and hardware optimization tools for gamers.
+                </p>
+                <ul className="space-y-2 mb-6 text-sm">
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Performance benchmarking tools</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Modding frameworks for game customization</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Hardware efficiency calculator</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-500 mr-2">•</span>
+                    <span>Game save editors and progression tools</span>
+                  </li>
+                </ul>
+                <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
+                  Explore Vault Tools
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </div>
+              </div>
             </Link>
           </div>
         </section>
 
-        {/* Playable Games Section */}
-        <section className="max-w-5xl mx-auto mt-16">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="mb-0">Play Games Instantly</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="icon" onClick={scrollPlayableLeft} disabled={currentPlayableIndex === 0}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={scrollPlayableRight}
-                disabled={currentPlayableIndex >= playableGamesData.length - 4}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+        {/* Featured Section */}
+        <section className="content-container-wide mx-auto mt-20 scroll-reveal">
+          <h2 className="mb-8">Featured This Week</h2>
 
-          <div ref={playableScrollRef} className="flex gap-4 overflow-hidden" style={{ scrollBehavior: "smooth" }}>
-            {playableGamesData.slice(currentPlayableIndex, currentPlayableIndex + 4).map((game) => (
-              <Link
-                key={game.id}
-                href={`/play/${game.id}`}
-                className="flex-none w-full sm:w-1/2 md:w-1/3 lg:w-1/4 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow no-underline"
-              >
-                <div className="aspect-video bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                  <div className="text-4xl">{game.title[0]}</div>
-                </div>
-                <div className="p-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="mb-0 text-base">{game.title}</h3>
-                    <span className="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs rounded-md">
-                      {game.category}
-                    </span>
-                  </div>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm mt-2">Play instantly in your browser</p>
-                  {user && (
-                    <div className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Earn 1 point per second playing</div>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
-          <div className="mt-4 text-center">
-            <Link href="/play" className="inline-flex items-center text-sm font-medium">
-              View All Playable Games →
-            </Link>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <div className="aspect-video relative">
+                <Image src="/placeholder.svg?height=300&width=500" alt="Featured game" fill className="object-cover" />
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl mb-2">New Game Releases</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Check out the latest games added to our catalog this week.
+                </p>
+                <Link href="/gcatalog" className="text-purple-600 hover:text-purple-700 font-medium">
+                  Browse New Games →
+                </Link>
+              </div>
+            </div>
+
+            <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <div className="aspect-video relative">
+                <Image src="/placeholder.svg?height=300&width=500" alt="AI feature" fill className="object-cover" />
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl mb-2">AI Storytelling</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Create custom game lore and narratives with our new AI tools.
+                </p>
+                <Link href="/vault-ai" className="text-purple-600 hover:text-purple-700 font-medium">
+                  Try AI Storytelling →
+                </Link>
+              </div>
+            </div>
+
+            <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <div className="aspect-video relative">
+                <Image
+                  src="/placeholder.svg?height=300&width=500"
+                  alt="Performance tools"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl mb-2">Performance Analyzer</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Optimize your gaming setup with our new performance tools.
+                </p>
+                <Link href="/vault-tools" className="text-purple-600 hover:text-purple-700 font-medium">
+                  Analyze Your Setup →
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Categories Section */}
-        <section className="max-w-5xl mx-auto mt-16">
-          <h2 className="mb-8">Browse by Category</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {topCategories.map((category) => (
+        {/* Call to Action */}
+        {!user && (
+          <section className="content-container-wide mx-auto mt-20 scroll-reveal">
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-8 text-center">
+              <h2 className="text-2xl mb-4">Join GameVaultX Today</h2>
+              <p className="text-lg mb-6 max-w-2xl mx-auto">
+                Create an account to track your favorite games, earn points, and access exclusive features across the
+                GameVaultX ecosystem.
+              </p>
               <Link
-                key={category.name}
-                href={`/categories/${encodeURIComponent(category.name.toLowerCase())}`}
-                className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 text-center hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors no-underline"
+                href="/auth"
+                className="px-6 py-3 bg-purple-600 text-white rounded-md no-underline hover:bg-purple-700 transition-colors inline-block"
               >
-                <h3 className="text-lg mb-1">{category.name}</h3>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">{category.count} games</p>
+                Sign Up Now
               </Link>
-            ))}
+            </div>
+          </section>
+        )}
+
+        {/* Ecosystem Diagram */}
+        <section className="content-container-wide mx-auto mt-20 scroll-reveal">
+          <h2 className="mb-8 text-center">How GameVaultX Works</h2>
+
+          <div className="bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+            <div className="max-w-3xl mx-auto">
+              <div className="relative py-10">
+                {/* Central hub */}
+                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-purple-200 dark:bg-purple-900/30 transform -translate-x-1/2"></div>
+
+                <div className="relative z-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800 w-64 mx-auto mb-16">
+                  <h3 className="text-lg font-bold text-center mb-2">GameVaultX Hub</h3>
+                  <p className="text-sm text-center">Central platform connecting all ecosystem components</p>
+                </div>
+
+                {/* Components */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                    <h3 className="text-lg font-bold mb-2">GCatalog</h3>
+                    <p className="text-sm mb-2">Game database and reviews</p>
+                    <ul className="text-xs space-y-1 list-disc pl-4">
+                      <li>Game listings</li>
+                      <li>Reviews & ratings</li>
+                      <li>Game comparisons</li>
+                      <li>Mods & customization</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+                    <h3 className="text-lg font-bold mb-2">Vault Search</h3>
+                    <p className="text-sm mb-2">Experimental search engine</p>
+                    <ul className="text-xs space-y-1 list-disc pl-4">
+                      <li>AI-powered game search</li>
+                      <li>Custom indexing</li>
+                      <li>Mod database search</li>
+                      <li>Performance benchmarks</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                    <h3 className="text-lg font-bold mb-2">Vault AI</h3>
+                    <p className="text-sm mb-2">Sandbox AI testing & experiments</p>
+                    <ul className="text-xs space-y-1 list-disc pl-4">
+                      <li>Jailbreak tests</li>
+                      <li>AI-driven NPC simulations</li>
+                      <li>AI story generation</li>
+                      <li>Response optimization</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
+                    <h3 className="text-lg font-bold mb-2">Vault Tools</h3>
+                    <p className="text-sm mb-2">Calculators, utilities & enhancements</p>
+                    <ul className="text-xs space-y-1 list-disc pl-4">
+                      <li>FPS calculator</li>
+                      <li>Modding tools</li>
+                      <li>Hardware optimization</li>
+                      <li>Game save editors</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
       <Footer />
     </div>
-  )
-}
-
-// Favorite button component
-function FavoriteButton({ gameId }: { gameId: string }) {
-  const { user, addFavorite, removeFavorite } = useAuth()
-
-  if (!user) return null
-
-  const isFavorite = user.favorites.includes(gameId)
-
-  const handleToggleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    if (isFavorite) {
-      await removeFavorite(gameId)
-    } else {
-      await addFavorite(gameId)
-    }
-  }
-
-  return (
-    <button
-      onClick={handleToggleFavorite}
-      className={`p-1 rounded-full ${isFavorite ? "text-red-500" : "text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"}`}
-      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill={isFavorite ? "currentColor" : "none"}
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="w-5 h-5"
-      >
-        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-      </svg>
-    </button>
   )
 }
 

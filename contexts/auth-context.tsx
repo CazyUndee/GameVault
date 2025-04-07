@@ -12,6 +12,8 @@ export type User = {
   wishlist: string[]
   createdAt: string
   provider?: string
+  displayName?: string
+  profileImage?: string
 }
 
 type AuthContextType = {
@@ -31,6 +33,10 @@ type AuthContextType = {
   removeFromWishlist: (gameId: string) => Promise<void>
   addPoints: (points: number) => Promise<void>
   shareFavorites: () => Promise<{ success: boolean; shareUrl: string; message: string }>
+  updateProfile: (data: { displayName?: string; profileImage?: string }) => Promise<{
+    success: boolean
+    message: string
+  }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -57,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkSession()
   }, [])
 
-  // Login function
+  // Fix the login function to preserve username case and ensure points are properly synced
   const login = async (email: string, password: string) => {
     try {
       // In a real app, this would be an API call to your backend
@@ -71,7 +77,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (users.length === 0) {
         const defaultUser = {
           id: `user_${Date.now()}`,
-          username: email.split("@")[0],
+          username: email.split("@")[0], // Preserve original case
+          displayName: email.split("@")[0], // Store display name separately
           email: email,
           emailVerified: true,
           password: password, // In a real app, this would be hashed
@@ -97,9 +104,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // If user not found but we have an email that looks valid, create a new account
       if (!foundUser && email.includes("@")) {
+        const username = email.split("@")[0] // Preserve original case
         const newUser = {
           id: `user_${Date.now()}`,
-          username: email.split("@")[0],
+          username: username, // Preserve original case
+          displayName: username, // Store display name separately
           email: email,
           emailVerified: false,
           password: password, // In a real app, this would be hashed
@@ -153,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Signup function
+  // Fix the signup function to preserve username case
   const signup = async (username: string, email: string, password: string) => {
     try {
       // In a real app, this would be an API call to your backend
@@ -179,8 +188,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Create new user
       const newUser = {
         id: `user_${Date.now()}`,
-        username,
-        email,
+        username: username, // Preserve original case
+        displayName: username, // Store display name separately
+        email: email,
         emailVerified: false,
         password, // In a real app, this would be hashed
         points: 100,
@@ -216,7 +226,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("user")
   }
 
-  // Social login function
+  // Fix the social login function to preserve username case
   const socialLogin = async (provider: string) => {
     try {
       // In a real app, this would redirect to OAuth flow
@@ -225,7 +235,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Generate a random email based on the provider
       const randomId = Math.floor(Math.random() * 10000)
       const email = `user${randomId}@${provider.toLowerCase()}.com`
-      const username = `${provider}User${randomId}`
+      const username = `${provider}User${randomId}` // Preserve original case
 
       // Check if user with this email already exists
       const usersJson = localStorage.getItem("users") || "[]"
@@ -244,7 +254,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Create new user
       const newUser = {
         id: `user_${Date.now()}`,
-        username,
+        username: username, // Preserve original case
+        displayName: username, // Store display name separately
         email,
         emailVerified: true, // OAuth users are considered verified
         provider,
@@ -478,7 +489,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  // Add points
+  // Fix the addPoints function to ensure points are properly synced
   const addPoints = async (points: number) => {
     if (!user) return
 
@@ -490,11 +501,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(updatedUser)
       localStorage.setItem("user", JSON.stringify(updatedUser))
 
-      // Update in users array
+      // Update in users array to ensure persistence
       const usersJson = localStorage.getItem("users") || "[]"
       const users = JSON.parse(usersJson)
-      const updatedUsers = users.map((u: any) => (u.id === user.id ? { ...u, points: updatedPoints } : u))
+      const updatedUsers = users.map((u: any) => {
+        if (u.id === user.id) {
+          return { ...u, points: updatedPoints }
+        }
+        return u
+      })
       localStorage.setItem("users", JSON.stringify(updatedUsers))
+
+      // Log points update for debugging
+      console.log(`Points updated: +${points}, new total: ${updatedPoints}`)
     } catch (error) {
       console.error("Error adding points:", error)
     }
@@ -546,6 +565,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Update profile
+  const updateProfile = async (data: { displayName?: string; profileImage?: string }) => {
+    if (!user) {
+      return {
+        success: false,
+        message: "You must be logged in to update your profile",
+      }
+    }
+
+    try {
+      // Update user data
+      const updatedUser = { ...user, ...data }
+
+      // Update user in state and localStorage
+      setUser(updatedUser)
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+
+      // Update in users array
+      const usersJson = localStorage.getItem("users") || "[]"
+      const users = JSON.parse(usersJson)
+      const updatedUsers = users.map((u: any) => (u.id === user.id ? { ...u, ...data } : u))
+      localStorage.setItem("users", JSON.stringify(updatedUsers))
+
+      return {
+        success: true,
+        message: "Profile updated successfully",
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      return {
+        success: false,
+        message: "An error occurred while updating your profile",
+      }
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -565,6 +620,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         removeFromWishlist,
         addPoints,
         shareFavorites,
+        updateProfile,
       }}
     >
       {children}

@@ -16,6 +16,12 @@
   --border: 228, 228, 231;
   --input: 228, 228, 231;
   --ring: 24, 24, 27;
+  --card: 255, 255, 255;
+  --card-foreground: 24, 24, 27;
+  --popover: 255, 255, 255;
+  --popover-foreground: 24, 24, 27;
+  --destructive: 239, 68, 68;
+  --destructive-foreground: 255, 255, 255;
 }
 
 .dark {
@@ -32,6 +38,12 @@
   --border: 63, 63, 70;
   --input: 63, 63, 70;
   --ring: 244, 244, 245;
+  --card: 39, 39, 42;
+  --card-foreground: 244, 244, 245;
+  --popover: 39, 39, 42;
+  --popover-foreground: 244, 244, 245;
+  --destructive: 239, 68, 68;
+  --destructive-foreground: 255, 255, 255;
 }
 
 body {
@@ -231,10 +243,87 @@ button:not([disabled]):hover {
     @apply fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 p-4 border-t border-zinc-200 dark:border-zinc-800 z-10;
   }
 
-  /* Fix the touch-target class by removing @apply and using direct CSS */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
   }
+}
+
+/* Animation for scrolling */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-delay-100 {
+  animation-delay: 0.1s;
+}
+
+.animate-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animate-delay-300 {
+  animation-delay: 0.3s;
+}
+
+.animate-delay-400 {
+  animation-delay: 0.4s;
+}
+
+/* Profile image upload */
+.profile-image-upload {
+  @apply relative cursor-pointer overflow-hidden rounded-full;
+}
+
+.profile-image-upload:hover .profile-image-overlay {
+  opacity: 1;
+}
+
+.profile-image-overlay {
+  @apply absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity;
+}
+
+/* Scrolling animations */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Staggered animation for lists */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.stagger-item.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Wider content area */
+.content-container {
+  @apply max-w-7xl mx-auto;
+}
+
+.content-container-wide {
+  @apply max-w-screen-2xl mx-auto;
 }
 

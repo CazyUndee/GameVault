@@ -76,7 +76,7 @@ export default function Categories() {
             {categories.map((category) => (
               <Link
                 key={category.name}
-                href={`/categories/${encodeURIComponent(category.name.toLowerCase())}`}
+                href={`/gcatalog/categories/${encodeURIComponent(category.name.toLowerCase())}`}
                 className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 hover:shadow-md transition-shadow no-underline"
               >
                 <div className="flex justify-between items-center mb-2">

@@ -2,8 +2,8 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Navbar from "@/components/navbar"
 import Footer from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -27,6 +27,43 @@ export default function AuthPage() {
 
   const { login, signup, socialLogin, sendOTP, verifyOTP } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  // Check for OAuth callback
+  useEffect(() => {
+    const provider = searchParams.get("provider")
+    const code = searchParams.get("code")
+
+    if (provider && code) {
+      // Handle OAuth callback
+      handleOAuthCallback(provider, code)
+    }
+  }, [searchParams])
+
+  const handleOAuthCallback = async (provider: string, code: string) => {
+    setIsLoading(true)
+    setError("")
+
+    try {
+      // In a real app, we would exchange the code for a token
+      // For demo purposes, we'll simulate a successful login
+      const result = await socialLogin(provider)
+
+      if (result.success) {
+        setSuccess(`${result.message}! Redirecting...`)
+        setTimeout(() => {
+          router.push("/")
+        }, 1500)
+      } else {
+        setError(result.message)
+      }
+    } catch (error) {
+      console.error(`OAuth callback error:`, error)
+      setError(`An error occurred during ${provider} login. Please try again.`)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const validatePassword = (password: string) => {
     if (password.length < 8) {
@@ -93,27 +130,56 @@ export default function AuthPage() {
     }
   }
 
-  const handleSocialLogin = async (provider: string) => {
-    setError("")
-    setSuccess("")
-    setIsLoading(true)
+  const handleSocialLogin = (provider: string) => {
+    // For demo purposes, we'll redirect to a simulated OAuth flow
+    // In a real app, you would use actual OAuth client IDs
 
-    try {
-      const result = await socialLogin(provider)
-      if (result.success) {
-        setSuccess(`${result.message}! Redirecting...`)
-        setTimeout(() => {
-          router.push("/")
-        }, 1500)
-      } else {
-        setError(result.message)
-      }
-    } catch (error) {
-      console.error(`${provider} login error:`, error)
-      setError(`An error occurred during ${provider} login. Please try again.`)
-    } finally {
-      setIsLoading(false)
+    // Simulate the OAuth flow by redirecting to the provider's site
+    let authUrl = ""
+
+    switch (provider) {
+      case "google":
+        // In a real app, you would use your actual Google OAuth client ID
+        authUrl =
+          "https://accounts.google.com/o/oauth2/v2/auth?client_id=DEMO_CLIENT_ID&redirect_uri=" +
+          encodeURIComponent(window.location.origin + "/auth?provider=google") +
+          "&response_type=code&scope=email%20profile"
+        break
+      case "github":
+        // In a real app, you would use your actual GitHub OAuth client ID
+        authUrl =
+          "https://github.com/login/oauth/authorize?client_id=DEMO_CLIENT_ID&redirect_uri=" +
+          encodeURIComponent(window.location.origin + "/auth?provider=github") +
+          "&scope=user:email"
+        break
+      case "microsoft":
+        // In a real app, you would use your actual Microsoft OAuth client ID
+        authUrl =
+          "https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=DEMO_CLIENT_ID&redirect_uri=" +
+          encodeURIComponent(window.location.origin + "/auth?provider=microsoft") +
+          "&response_type=code&scope=openid%20profile%20email"
+        break
+      default:
+        // For demo purposes, we'll just simulate a successful login
+        socialLogin(provider).then((result) => {
+          if (result.success) {
+            setSuccess(`${result.message}! Redirecting...`)
+            setTimeout(() => {
+              router.push("/")
+            }, 1500)
+          } else {
+            setError(result.message)
+          }
+        })
+        return
     }
+
+    // For demo purposes, we'll open the auth URL in a new window
+    // In a real app, you would redirect the current window
+    window.open(authUrl, "_blank", "width=600,height=700")
+
+    // Show a message to the user
+    setSuccess(`Please complete the ${provider} login in the popup window.`)
   }
 
   const handleSendOTP = async (e: React.FormEvent) => {

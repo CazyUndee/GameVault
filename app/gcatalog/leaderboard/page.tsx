@@ -127,7 +127,7 @@ export default function LeaderboardPage() {
                   >
                     <div className="w-10 text-center font-bold text-zinc-500 dark:text-zinc-400">{index + 1}</div>
                     <div className="flex-1 font-medium">
-                      {player.username}
+                      {player.displayName || player.username}
                       {player.id === user?.id && (
                         <span className="ml-2 text-xs bg-zinc-200 dark:bg-zinc-700 px-2 py-0.5 rounded">You</span>
                       )}

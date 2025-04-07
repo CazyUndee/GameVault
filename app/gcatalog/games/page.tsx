@@ -6,8 +6,10 @@ import Footer from "@/components/footer"
 import Link from "next/link"
 import Image from "next/image"
 import { gamesData } from "@/data/games"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function Games() {
+  const { user } = useAuth()
   const [games, setGames] = useState(gamesData)
   const [sortBy, setSortBy] = useState("newest")
   const [filterGenre, setFilterGenre] = useState("all")
@@ -128,7 +130,7 @@ export default function Games() {
                       ))}
                     </div>
                     <div className="flex justify-between items-center">
-                      <Link href={`/games/${game.id}`} className="text-sm font-medium">
+                      <Link href={`/gcatalog/games/${game.id}`} className="text-sm font-medium">
                         View Details →
                       </Link>
                       <div className="px-2 py-1 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 text-xs font-medium rounded-md">
