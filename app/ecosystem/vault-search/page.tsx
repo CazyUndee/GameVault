@@ -1,52 +1,40 @@
-import type { Metadata } from "next"
-import { Button } from "@/components/ui/button"
+"use client"
 
-export const metadata: Metadata = {
-  title: "Vault Search - GameVaultX",
-  description: "Simple search page",
-}
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
-// Mock data
-const recommendedGames = [
-  {
-    id: 1,
-    title: "Game 1",
-    tags: ["Action", "RPG"],
-    image: "/placeholder.svg?height=150&width=250",
-  },
-  {
-    id: 2,
-    title: "Game 2",
-    tags: ["Strategy"],
-    image: "/placeholder.svg?height=150&width=250",
-  },
-]
+export default function VaultSearch() {
+  const [query, setQuery] = useState("")
+  const router = useRouter()
 
-export default function VaultSearchPage() {
+  const handleSearch = (e) => {
+    e.preventDefault()
+    if (query.trim()) {
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank")
+    }
+  }
+
   return (
-    <div className="container p-4">
-      <h1 className="text-2xl font-bold mb-4">Vault Search</h1>
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-6 text-center">Vault Search</h1>
 
-      <div className="mb-4">
-        <input type="text" placeholder="Search games..." className="w-full p-2 border rounded" />
-        <Button className="mt-2">Search</Button>
-      </div>
-
-      <div className="mt-4">
-        <h2 className="text-xl font-bold mb-2">Recommended Games</h2>
-        {recommendedGames.map((game) => (
-          <div key={game.id} className="border p-2 mb-2 rounded">
-            <h3>{game.title}</h3>
-            <div className="flex gap-1 mt-1">
-              {game.tags.map((tag) => (
-                <span key={tag} className="bg-gray-200 px-2 py-1 rounded text-xs">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <form onSubmit={handleSearch} className="max-w-xl mx-auto">
+        <div className="relative">
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search the web..."
+            className="w-full p-4 pr-12 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700"
+          >
+            Search
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

@@ -8,7 +8,7 @@ import Footer from "@/components/footer"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ThumbsUp, ThumbsDown, Heart, BookmarkPlus, ShoppingCart, MessageSquare, Reply } from 'lucide-react'
+import { ThumbsUp, ThumbsDown, Heart, BookmarkPlus, ShoppingCart, MessageSquare, Reply } from "lucide-react"
 import { gamesData } from "@/data/games"
 import { useAuth } from "@/contexts/auth-context"
 import { useRouter } from "next/navigation"
@@ -135,7 +135,7 @@ export default function GameDetails({ params }: { params: { id: string } }) {
         <main className="flex-1 px-4 md:px-6 py-12 md:py-20">
           <div className="max-w-5xl mx-auto text-center">
             <h1 className="mb-4">Game Not Found</h1>
-            <p className="mb-8">The game you're looking for doesn't exist or has been removed.</p>
+            <p className="mb-8">The game you&apos;re looking for doesn&apos;t exist or has been removed.</p>
             <Link
               href="/gcatalog/games"
               className="px-6 py-3 bg-zinc-900 text-white dark:bg-white dark:text-zinc-900 rounded-md no-underline hover:opacity-90 transition-opacity"
@@ -420,11 +420,6 @@ export default function GameDetails({ params }: { params: { id: string } }) {
 
             <div>
               <div className="flex flex-wrap gap-2 mb-4">
-                  />
-            </div>
-
-            <div>
-              <div className="flex flex-wrap gap-2 mb-4">
                 {game.genres.map((genre) => (
                   <span
                     key={genre}
@@ -693,4 +688,18 @@ export default function GameDetails({ params }: { params: { id: string } }) {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg max-w-md w-full">
             <h3 className="text-xl font-semibold mb-4">Login Required</h3>
-            <p className="mb-6">
+            <p className="mb-6">You need to be logged in to perform this action.</p>
+            <div className="flex justify-end gap-4">
+              <Button variant="outline" onClick={() => setShowLoginPrompt(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => router.push("/auth")}>Login</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </div>
+  )
+}
