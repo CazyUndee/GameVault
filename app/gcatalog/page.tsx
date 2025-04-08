@@ -531,4 +531,3 @@ function FavoriteButton({ gameId }: { gameId: string }) {
     </button>
   )
 }
-

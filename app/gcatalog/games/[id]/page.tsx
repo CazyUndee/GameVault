@@ -694,4 +694,3 @@ export default function GameDetails({ params }: { params: { id: string } }) {
           <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg max-w-md w-full">
             <h3 className="text-xl font-semibold mb-4">Login Required</h3>
             <p className="mb-6">
-

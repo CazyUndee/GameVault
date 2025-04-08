@@ -100,4 +100,3 @@ export default function ProfileImageUpload({ currentImage, onImageChange }: Prof
     </div>
   )
 }
-

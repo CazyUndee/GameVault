@@ -14,4 +14,3 @@ export function getUserId(): string {
 
   return userId
 }
-

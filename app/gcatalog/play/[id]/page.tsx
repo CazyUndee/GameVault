@@ -685,4 +685,3 @@ export default function PlayGame({ params }: { params: { id: string } }) {
     </div>
   )
 }
-

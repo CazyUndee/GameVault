@@ -148,4 +148,3 @@ export default function VaultSearchPage() {
                           {game.reason}
                         </p>
                       </div>\
-

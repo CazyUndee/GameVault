@@ -82,4 +82,3 @@ export default function CategoryPage({ params }: { params: { category: string } 
     </div>
   )
 }
-

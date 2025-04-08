@@ -235,4 +235,3 @@ function FavoriteGameCard({ game }: { game: any }) {
     </div>
   )
 }
-

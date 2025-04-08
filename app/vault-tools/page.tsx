@@ -302,4 +302,3 @@ export default function VaultTools() {
     </div>
   )
 }
-

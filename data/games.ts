@@ -1671,4 +1671,3 @@ export const playableGamesData = [
     iframePadding: true,
   },
 ]
-

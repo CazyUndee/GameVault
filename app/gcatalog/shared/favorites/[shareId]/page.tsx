@@ -174,4 +174,3 @@ export default function SharedFavoritesPage({ params }: { params: { shareId: str
     </div>
   )
 }
-
