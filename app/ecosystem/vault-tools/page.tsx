@@ -1,25 +1,3 @@
-"use client";
-
-import { useState } from "react";
-import { useAuth } from "@/contexts/auth-context";
-
-// System specification types
-type SystemSpec = {
-  cpu: string;
-  gpu: string;
-  ram: string;
-  storage: string;
-  os: string;
-};
-
-// Performance prediction types
-type PerformancePrediction = {
-  fps: number;
-  quality: string;
-  bottleneck: string | null;
-  recommendations: string[];
-};
-
 export default function VaultTools() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<string>("benchmark");
@@ -42,19 +20,15 @@ function enhancedInventory() {
   const maxSlots = 50;
   const categories = ['weapons', 'armor', 'consumables', 'quest'];
 
-  // Auto-sorting functionality
   function autoSort(items) {
     return items.sort((a, b) => {
-      // Sort by category first
       if (a.category !== b.category) {
         return categories.indexOf(a.category) - categories.indexOf(b.category);
       }
-      // Then by rarity
       return b.rarity - a.rarity;
     });
   }
 
-  // Initialize inventory
   return {
     items: [],
     addItem(item) {
@@ -90,10 +64,7 @@ class WeatherSystem {
   }
 
   update(deltaTime) {
-    // Update particle effects
     this.updateParticles(deltaTime);
-
-    // Random weather changes
     if (Math.random() < 0.001) {
       this.transitionToWeather(this.getRandomWeather());
     }
@@ -110,11 +81,9 @@ class WeatherSystem {
   transitionToWeather(weatherType) {
     console.log(\`Transitioning to \${weatherType} weather\`);
     this.currentWeather = weatherType;
-    // Implementation details for weather transition
   }
 
   updateParticles(deltaTime) {
-    // Update existing particles
     for (let i = this.particles.length - 1; i >= 0; i--) {
       const particle = this.particles[i];
       particle.life -= deltaTime;
@@ -127,11 +96,5 @@ class WeatherSystem {
     },
   ]);
 
-  return (
-    <div>
-      <h1>Vault Tools</h1>
-      <p>Welcome to the Vault Tools page. Select a tool to get started.</p>
-      {/* Add your component's JSX here */}
-    </div>
-  );
+  // No return block
 }
