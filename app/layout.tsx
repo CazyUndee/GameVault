@@ -13,7 +13,6 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "GameVaultX - Your Gaming Hub",
   description: "Discover, play, and share your favorite games in one place",
-    generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -35,6 +34,3 @@ export default function RootLayout({
     </html>
   )
 }
-
-
-import './globals.css'
