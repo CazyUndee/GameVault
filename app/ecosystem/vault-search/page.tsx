@@ -87,15 +87,10 @@ export default function VaultSearchPage() {
       <div className="bg-white dark:bg-gray-950 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-4 mb-8">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input 
-            className="pl-10 pr-4 py-6 text-lg" 
-            placeholder="Search for games, genres, or mechanics..." 
-          />
-          <Button className="absolute right-2 top-1/2 transform -translate-y-1/2">
-            Search
-          </Button>
+          <Input className="pl-10 pr-4 py-6 text-lg" placeholder="Search for games, genres, or mechanics..." />
+          <Button className="absolute right-2 top-1/2 transform -translate-y-1/2">Search</Button>
         </div>
-        
+
         <div className="mt-4 flex flex-wrap gap-2">
           <Badge variant="outline" className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800">
             Open World
@@ -134,17 +129,92 @@ export default function VaultSearchPage() {
                 <span className="text-sm font-medium">AI-powered</span>
               </div>
             </div>
-            
+
             <div className="space-y-6 mb-8">
               {recommendedGames.map((game) => (
-                <div key={game.id} className="flex flex-col md:flex-row gap-4 border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <img src={game.image || "/placeholder.svg"} alt={game.title} className="w-full md:w-48 h-32 object-cover rounded-md" />
-                  
+                <div
+                  key={game.id}
+                  className="flex flex-col md:flex-row gap-4 border border-gray-200 dark:border-gray-800 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <img
+                    src={game.image || "/placeholder.svg"}
+                    alt={game.title}
+                    className="w-full md:w-48 h-32 object-cover rounded-md"
+                  />
+
                   <div className="flex-grow">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="text-xl font-bold">{game.title}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                          {game.reason}
-                        </p>
-                      </div>\
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{game.reason}</p>
+                      </div>
+                      <div className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-100 font-bold rounded-full h-10 w-10 flex items-center justify-center">
+                        {game.matchScore}%
+                      </div>
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {game.tags.map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 flex justify-between items-center">
+                      <div className="flex gap-2">
+                        {game.platforms.map((platform) => (
+                          <Badge key={platform} variant="outline" className="text-xs">
+                            {platform}
+                          </Badge>
+                        ))}
+                      </div>
+                      <Button size="sm">View Details</Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="cross-platform">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+            <div className="text-center p-8">
+              <h3 className="text-xl font-medium mb-2">Connect Your Gaming Platforms</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Link your Steam, Epic Games, PlayStation, Xbox, and other accounts to track your games across platforms.
+              </p>
+              <Button>Connect Platforms</Button>
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="niche-categories">
+          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {nicheCategoryGames.map((game) => (
+                <div
+                  key={game.id}
+                  className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <img src={game.image || "/placeholder.svg"} alt={game.title} className="w-full h-32 object-cover" />
+                  <div className="p-4">
+                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider">
+                      {game.category}
+                    </span>
+                    <h3 className="font-bold mt-1">{game.title}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{game.developer}</p>
+                    <Button variant="outline" size="sm" className="w-full mt-3">
+                      Explore
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
