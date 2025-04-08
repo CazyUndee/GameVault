@@ -49,7 +49,7 @@ export default function HomePage() {
         >
           <div className="flex flex-col items-start mb-10">
             <h1 className="mb-2 flex items-center">
-              Welcome to GameVaultX
+              Welcome to Vaultican
               {user && <span className="ml-2">, {user.displayName || user.username}</span>}
               <Sparkles className="ml-2 h-8 w-8 text-purple-500" />
             </h1>
@@ -92,40 +92,21 @@ export default function HomePage() {
 
         {/* Ecosystem Overview */}
         <section className="content-container-wide mx-auto mt-20 scroll-reveal">
-          <h2 className="mb-10 text-center">The GameVaultX Ecosystem</h2>
+          <h2 className="mb-10 text-center">The Vaultican Ecosystem</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             {/* GCatalog Card */}
             <Link href="/gcatalog" className="group">
               <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
                 <div className="flex items-center mb-4">
                   <Database className="h-8 w-8 text-purple-600 mr-3" />
-                  <h2 className="text-2xl font-bold">GCatalog</h2>
+                  <h2 className="text-xl font-bold">GCatalog</h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Comprehensive game database with detailed metadata, tagging system, and community-driven mod
-                  recommendations.
+                  Comprehensive game database with detailed metadata and tagging system.
                 </p>
-                <ul className="space-y-2 mb-6 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Detailed game metadata and developer insights</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Advanced tagging system for precise categorization</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Custom user lists for organization</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Community-driven mod recommendations</span>
-                  </li>
-                </ul>
                 <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
-                  Explore GCatalog
+                  Explore
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
@@ -136,32 +117,13 @@ export default function HomePage() {
               <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
                 <div className="flex items-center mb-4">
                   <Search className="h-8 w-8 text-purple-600 mr-3" />
-                  <h2 className="text-2xl font-bold">Vault Search</h2>
+                  <h2 className="text-xl font-bold">Vault Search</h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  AI-powered game discovery engine with cross-platform tracking and specialized filters for niche
-                  categories.
+                  AI-powered game discovery engine with cross-platform tracking.
                 </p>
-                <ul className="space-y-2 mb-6 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>AI-powered recommendations based on play history</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Cross-platform game availability tracking</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Niche category filters for specialized discovery</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>System compatibility matching</span>
-                  </li>
-                </ul>
                 <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
-                  Explore Vault Search
+                  Explore
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
@@ -172,31 +134,13 @@ export default function HomePage() {
               <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
                 <div className="flex items-center mb-4">
                   <Bot className="h-8 w-8 text-purple-600 mr-3" />
-                  <h2 className="text-2xl font-bold">Vault AI</h2>
+                  <h2 className="text-xl font-bold">Vault AI</h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Experimental AI sandbox for NPC behavior modeling, lore generation, and procedural content creation.
+                  Experimental AI sandbox for NPC behavior modeling and lore generation.
                 </p>
-                <ul className="space-y-2 mb-6 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>AI-driven NPC behavior models</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Chatbot-powered lore generators</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Procedural generation tools</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>AI response optimization</span>
-                  </li>
-                </ul>
                 <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
-                  Explore Vault AI
+                  Explore
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
@@ -207,31 +151,13 @@ export default function HomePage() {
               <div className="border border-gray-200 dark:border-gray-800 rounded-lg p-6 h-full transition-all duration-300 hover:shadow-md hover:border-purple-500 dark:hover:border-purple-500">
                 <div className="flex items-center mb-4">
                   <Tool className="h-8 w-8 text-purple-600 mr-3" />
-                  <h2 className="text-2xl font-bold">Vault Tools</h2>
+                  <h2 className="text-xl font-bold">Vault Tools</h2>
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Performance benchmarking, modding frameworks, and hardware optimization tools for gamers.
+                  Performance benchmarking, modding frameworks, and hardware optimization tools.
                 </p>
-                <ul className="space-y-2 mb-6 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Performance benchmarking tools</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Modding frameworks for game customization</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Hardware efficiency calculator</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-500 mr-2">•</span>
-                    <span>Game save editors and progression tools</span>
-                  </li>
-                </ul>
                 <div className="flex items-center text-purple-600 font-medium group-hover:text-purple-700">
-                  Explore Vault Tools
+                  Explore
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>
@@ -243,7 +169,7 @@ export default function HomePage() {
         <section className="content-container-wide mx-auto mt-20 scroll-reveal">
           <h2 className="mb-8">Featured This Week</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
               <div className="aspect-video relative">
                 <Image src="/placeholder.svg?height=300&width=500" alt="Featured game" fill className="object-cover" />
@@ -293,6 +219,21 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
+
+            <div className="border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden">
+              <div className="aspect-video relative">
+                <Image src="/placeholder.svg?height=300&width=500" alt="Game news" fill className="object-cover" />
+              </div>
+              <div className="p-4">
+                <h3 className="text-xl mb-2">Gaming News</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Stay updated with the latest gaming news and industry trends.
+                </p>
+                <Link href="/vault-search" className="text-purple-600 hover:text-purple-700 font-medium">
+                  Read Latest News →
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -300,10 +241,10 @@ export default function HomePage() {
         {!user && (
           <section className="content-container-wide mx-auto mt-20 scroll-reveal">
             <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-8 text-center">
-              <h2 className="text-2xl mb-4">Join GameVaultX Today</h2>
+              <h2 className="text-2xl mb-4">Join Vaultican Today</h2>
               <p className="text-lg mb-6 max-w-2xl mx-auto">
                 Create an account to track your favorite games, earn points, and access exclusive features across the
-                GameVaultX ecosystem.
+                Vaultican ecosystem.
               </p>
               <Link
                 href="/auth"
@@ -317,18 +258,19 @@ export default function HomePage() {
 
         {/* Ecosystem Diagram */}
         <section className="content-container-wide mx-auto mt-20 scroll-reveal">
-          <h2 className="mb-8 text-center">How GameVaultX Works</h2>
+          <h2 className="mb-8 text-center">How Vaultican Works</h2>
 
           <div className="bg-white dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
             <div className="max-w-3xl mx-auto">
               <div className="relative py-10">
-                {/* Central hub */}
-                <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-purple-200 dark:bg-purple-900/30 transform -translate-x-1/2"></div>
-
-                <div className="relative z-10 bg-purple-100 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800 w-64 mx-auto mb-16">
-                  <h3 className="text-lg font-bold text-center mb-2">GameVaultX Hub</h3>
+                {/* Central hub - positioned above the line */}
+                <div className="relative z-20 bg-purple-100 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800 w-64 mx-auto mb-16">
+                  <h3 className="text-lg font-bold text-center mb-2">Vaultican Hub</h3>
                   <p className="text-sm text-center">Central platform connecting all ecosystem components</p>
                 </div>
+
+                {/* Divider line - positioned below the hub */}
+                <div className="absolute left-1/2 top-32 bottom-0 w-1 bg-purple-200 dark:bg-purple-900/30 transform -translate-x-1/2"></div>
 
                 {/* Components */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">

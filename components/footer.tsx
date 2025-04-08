@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h3 className="text-lg font-medium mb-4">GameVaultX</h3>
+            <h3 className="text-lg font-medium mb-4">Vaultican</h3>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
               Your minimalist game catalog for discovering and exploring games across all platforms.
             </p>
@@ -126,7 +126,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/privacy-policy"
                   className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
                 >
                   Privacy Policy
@@ -134,7 +134,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/terms-of-service"
                   className="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
                 >
                   Terms of Service
@@ -144,9 +144,9 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4 md:mb-0">
-            © {currentYear} GameVault. All rights reserved.
+        <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-col items-center">
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+            © {currentYear} Vaultican. All rights reserved.
           </p>
           <div className="flex items-center text-sm text-zinc-500 dark:text-zinc-400">
             <span>Made with</span>

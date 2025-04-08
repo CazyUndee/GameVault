@@ -2,7 +2,19 @@
 
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
-import { Menu, X, User, LogOut, Trophy, Database, Search, Bot, PenToolIcon as Tool } from "lucide-react"
+import {
+  Menu,
+  X,
+  User,
+  LogOut,
+  Trophy,
+  Database,
+  Search,
+  Bot,
+  PenToolIcon as Tool,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react"
 import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
@@ -11,6 +23,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+  const [mobileSubMenuOpen, setMobileSubMenuOpen] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const { user, logout } = useAuth()
@@ -29,6 +42,7 @@ export default function Navbar() {
 
   const handleNavigation = (path: string) => {
     setIsMenuOpen(false)
+    setMobileSubMenuOpen(null)
     router.push(path)
     window.scrollTo(0, 0)
   }
@@ -45,6 +59,10 @@ export default function Navbar() {
     dropdownTimeoutRef.current = setTimeout(() => {
       setActiveDropdown(null)
     }, 300) // Delay before closing dropdown
+  }
+
+  const toggleMobileSubMenu = (menu: string) => {
+    setMobileSubMenuOpen(mobileSubMenuOpen === menu ? null : menu)
   }
 
   // Determine if we're in a specific section
@@ -66,7 +84,7 @@ export default function Navbar() {
                 handleNavigation("/")
               }}
             >
-              GameVault<span className="text-accent">X</span>
+              Vaultican<span className="text-accent">.</span>
             </Link>
 
             {/* Points display for mobile - only shown when logged in and NOT on homepage */}
@@ -342,52 +360,65 @@ export default function Navbar() {
             </Link>
 
             <div className="py-2">
-              <div className="font-medium mb-1 flex items-center">
-                <Database className="h-4 w-4 mr-1" />
-                GCatalog
-              </div>
-              <div className="pl-5 space-y-2 mt-1">
-                <Link
-                  href="/gcatalog"
-                  className="block py-1 text-sm no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog")
-                  }}
-                >
-                  Overview
-                </Link>
-                <Link
-                  href="/gcatalog/games"
-                  className="block py-1 text-sm no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog/games")
-                  }}
-                >
-                  Browse Games
-                </Link>
-                <Link
-                  href="/gcatalog/play"
-                  className="block py-1 text-sm no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog/play")
-                  }}
-                >
-                  Play Games
-                </Link>
-                <Link
-                  href="/gcatalog/categories"
-                  className="block py-1 text-sm no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog/categories")
-                  }}
-                >
-                  Categories
-                </Link>
-              </div>
+              <button
+                className="w-full text-left font-medium mb-1 flex items-center justify-between"
+                onClick={() => toggleMobileSubMenu("gcatalog")}
+              >
+                <div className="flex items-center">
+                  <Database className="h-4 w-4 mr-1" />
+                  GCatalog
+                </div>
+                {mobileSubMenuOpen === "gcatalog" ? (
+                  <ChevronDown className="h-4 w-4" />
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+
+              {mobileSubMenuOpen === "gcatalog" && (
+                <div className="pl-5 space-y-2 mt-1">
+                  <Link
+                    href="/gcatalog"
+                    className="block py-1 text-sm no-underline"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavigation("/gcatalog")
+                    }}
+                  >
+                    Overview
+                  </Link>
+                  <Link
+                    href="/gcatalog/games"
+                    className="block py-1 text-sm no-underline"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavigation("/gcatalog/games")
+                    }}
+                  >
+                    Browse Games
+                  </Link>
+                  <Link
+                    href="/gcatalog/play"
+                    className="block py-1 text-sm no-underline"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavigation("/gcatalog/play")
+                    }}
+                  >
+                    Play Games
+                  </Link>
+                  <Link
+                    href="/gcatalog/categories"
+                    className="block py-1 text-sm no-underline"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavigation("/gcatalog/categories")
+                    }}
+                  >
+                    Categories
+                  </Link>
+                </div>
+              )}
             </div>
 
             <Link

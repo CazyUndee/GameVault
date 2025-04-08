@@ -18,7 +18,7 @@ export default function VaultTools() {
     // Here you would normally handle the newsletter signup
     console.log("Subscribed:", email)
     setEmail("")
-    alert("Thanks for subscribing! We'll notify you when Vault Tools launches.")
+    alert("Thanks for subscribing! We'll notify you when more Vault Tools launch.")
   }
 
   return (
@@ -33,31 +33,41 @@ export default function VaultTools() {
               <p className="text-zinc-600 dark:text-zinc-400">Powerful tools for gamers and developers</p>
             </div>
             <Link href="/" className="text-sm font-medium">
-              ← Back to GameVaultX
+              ← Back to Vaultican
             </Link>
           </div>
 
-          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 mb-8 text-center">
+          <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 mb-8">
             <div className="inline-block p-3 bg-accent/10 rounded-full mb-4">
               <PenTool className="h-8 w-8 text-accent" />
             </div>
-            <h2 className="text-2xl font-bold mb-4">Coming Soon</h2>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-6 max-w-lg mx-auto">
-              We're building a suite of powerful tools for gamers, developers, and content creators. Be the first to
-              know when we launch!
+            <h2 className="text-2xl font-bold mb-4">Vault Tools Suite</h2>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-6 max-w-lg">
+              A collection of powerful tools for gamers, developers, and content creators. We're constantly adding new
+              tools to help you optimize your gaming experience.
             </p>
 
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col sm:flex-row gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Your email address"
-                className="flex-grow px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent dark:bg-zinc-700"
-                required
-              />
-              <Button type="submit">Notify Me</Button>
-            </form>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link href="/vault-tools/calculator">
+                <Button variant="outline" className="w-full justify-start">
+                  <Calculator className="mr-2 h-5 w-5 text-purple-600" />
+                  <span>Calculator</span>
+                  <ChevronRight className="ml-auto h-5 w-5" />
+                </Button>
+              </Link>
+
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email for tool updates"
+                  className="flex-grow px-4 py-2 border border-zinc-300 dark:border-zinc-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent dark:bg-zinc-700"
+                  required
+                />
+                <Button type="submit">Notify Me</Button>
+              </form>
+            </div>
           </div>
 
           <Tabs defaultValue="all" className="mb-8">
@@ -84,6 +94,24 @@ export default function VaultTools() {
                 <Button variant="ghost" size="sm" className="flex items-center">
                   Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
+              </div>
+
+              {/* Calculator Tool - Available */}
+              <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mr-3">
+                    <Calculator className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <h3 className="font-semibold">Calculator</h3>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                  A versatile calculator with memory functions for quick gaming-related calculations.
+                </p>
+                <Link href="/vault-tools/calculator">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    Try Now <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
 
               {/* Developer Tools */}
@@ -197,6 +225,23 @@ export default function VaultTools() {
                   Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
+
+              <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mr-3">
+                    <Calculator className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <h3 className="font-semibold">Calculator</h3>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                  A versatile calculator with memory functions for quick gaming-related calculations.
+                </p>
+                <Link href="/vault-tools/calculator">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    Try Now <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
             </TabsContent>
 
             <TabsContent value="developer" className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -228,6 +273,23 @@ export default function VaultTools() {
                 <Button variant="ghost" size="sm" className="flex items-center">
                   Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
+              </div>
+
+              <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mr-3">
+                    <Calculator className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <h3 className="font-semibold">Calculator</h3>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                  A versatile calculator with memory functions for development calculations.
+                </p>
+                <Link href="/vault-tools/calculator">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    Try Now <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </TabsContent>
 
@@ -261,22 +323,41 @@ export default function VaultTools() {
                   Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
+
+              <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mr-3">
+                    <Calculator className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <h3 className="font-semibold">Calculator</h3>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                  A versatile calculator with memory functions for hardware-related calculations.
+                </p>
+                <Link href="/vault-tools/calculator">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    Try Now <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
             </TabsContent>
 
             <TabsContent value="utilities" className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
                 <div className="flex items-center mb-4">
-                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full mr-3">
-                    <Calculator className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full mr-3">
+                    <Calculator className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <h3 className="font-semibold">Gaming Calculators</h3>
+                  <h3 className="font-semibold">Calculator</h3>
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                  Various calculators for in-game stats, DPS, efficiency, and more.
+                  A versatile calculator with memory functions for quick calculations.
                 </p>
-                <Button variant="ghost" size="sm" className="flex items-center">
-                  Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
-                </Button>
+                <Link href="/vault-tools/calculator">
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    Try Now <ChevronRight className="ml-1 h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
 
               <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
@@ -288,6 +369,21 @@ export default function VaultTools() {
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
                   Benchmark your system and compare performance with other gamers.
+                </p>
+                <Button variant="ghost" size="sm" className="flex items-center">
+                  Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="bg-white dark:bg-zinc-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-center mb-4">
+                  <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full mr-3">
+                    <Calculator className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <h3 className="font-semibold">Gaming Calculators</h3>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                  Various calculators for in-game stats, DPS, efficiency, and more.
                 </p>
                 <Button variant="ghost" size="sm" className="flex items-center">
                   Coming Soon <ChevronRight className="ml-1 h-4 w-4" />
