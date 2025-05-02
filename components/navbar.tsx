@@ -19,6 +19,28 @@ import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 
+// Define subsite links
+const gCatalogLinks = [
+  { href: "/gcatalog/games", label: "Browse Games" },
+  { href: "/gcatalog/categories", label: "Categories" },
+  { href: "/gcatalog/play", label: "Play Games" }, // Example link
+]
+
+const vaultSearchLinks = [
+  { href: "/vault-search/advanced", label: "Advanced Search" }, // Example link
+  { href: "/vault-search/saved", label: "Saved Searches" }, // Example link
+]
+
+const vaultAILinks = [
+  { href: "/vault-ai/sandbox", label: "NPC Sandbox" }, // Example link
+  { href: "/vault-ai/lore", label: "Lore Generator" }, // Example link
+]
+
+const vaultToolsLinks = [
+  { href: "/vault-tools/benchmarks", label: "Benchmarks" }, // Example link
+  { href: "/vault-tools/mods", label: "Mod Manager" }, // Example link
+]
+
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -70,6 +92,14 @@ export default function Navbar() {
   const isInVaultSearch = pathname?.startsWith("/vault-search")
   const isInVaultAI = pathname?.startsWith("/vault-ai")
   const isInVaultTools = pathname?.startsWith("/vault-tools")
+  const isInSubSite = isInGCatalog || isInVaultSearch || isInVaultAI || isInVaultTools
+
+  // Determine which set of links to show
+  let currentSubSiteLinks: { href: string; label: string }[] = []
+  if (isInGCatalog) currentSubSiteLinks = gCatalogLinks
+  else if (isInVaultSearch) currentSubSiteLinks = vaultSearchLinks
+  else if (isInVaultAI) currentSubSiteLinks = vaultAILinks
+  else if (isInVaultTools) currentSubSiteLinks = vaultToolsLinks
 
   return (
     <nav className="py-6 px-4 md:px-6 w-full">
@@ -115,9 +145,12 @@ export default function Navbar() {
 
           {/* Desktop navigation */}
           <div className="hidden lg:flex space-x-4 items-center">
+            {/* Always show Home link */}
             <Link
               href="/"
-              className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 ${isHomePage ? "font-medium" : ""}`}
+              className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 ${
+                isHomePage ? "font-medium" : ""
+              }`}
               onClick={(e) => {
                 e.preventDefault()
                 handleNavigation("/")
@@ -126,121 +159,119 @@ export default function Navbar() {
               Home
             </Link>
 
-            {/* GCatalog Dropdown */}
-            <div
-              className="relative"
-              onMouseEnter={() => handleDropdownEnter("gcatalog")}
-              onMouseLeave={handleDropdownLeave}
-            >
-              <Link
-                href="/gcatalog"
-                className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
-                  isInGCatalog ? "font-medium" : ""
-                }`}
-                onClick={(e) => {
-                  e.preventDefault()
-                  handleNavigation("/gcatalog")
-                }}
-              >
-                <Database className="h-4 w-4" />
-                <span>GCatalog</span>
-              </Link>
-              <div
-                className={`absolute left-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-md shadow-lg border border-zinc-200 dark:border-zinc-700 z-50 transition-opacity duration-200 ${
-                  activeDropdown === "gcatalog" ? "opacity-100 visible" : "opacity-0 invisible"
-                }`}
-              >
-                <div className="py-1">
+            {isHomePage ? (
+              // Homepage Navigation
+              <>
+                {/* GCatalog Dropdown */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => handleDropdownEnter("gcatalog")}
+                  onMouseLeave={handleDropdownLeave}
+                >
                   <Link
-                    href="/gcatalog/games"
-                    className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 no-underline"
+                    href="/gcatalog"
+                    className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
+                      isInGCatalog ? "font-medium" : ""
+                    }`}
                     onClick={(e) => {
                       e.preventDefault()
-                      handleNavigation("/gcatalog/games")
+                      handleNavigation("/gcatalog")
                     }}
                   >
-                    Browse Games
+                    <Database className="h-4 w-4" />
+                    <span>GCatalog</span>
                   </Link>
-                  <Link
-                    href="/gcatalog/play"
-                    className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 no-underline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavigation("/gcatalog/play")
-                    }}
+                  <div
+                    className={`absolute left-0 mt-2 w-48 bg-white dark:bg-zinc-800 rounded-md shadow-lg border border-zinc-200 dark:border-zinc-700 z-50 transition-opacity duration-200 ${
+                      activeDropdown === "gcatalog" ? "opacity-100 visible" : "opacity-0 invisible"
+                    }`}
                   >
-                    Play Games
-                  </Link>
-                  <Link
-                    href="/gcatalog/categories"
-                    className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 no-underline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavigation("/gcatalog/categories")
-                    }}
-                  >
-                    Categories
-                  </Link>
+                    <div className="py-1">
+                      {gCatalogLinks.map((link) => (
+                        <Link
+                          key={link.href}
+                          href={link.href}
+                          className="block px-4 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-700 no-underline"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            handleNavigation(link.href)
+                          }}
+                        >
+                          {link.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <Link
-              href="/vault-search"
-              className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
-                isInVaultSearch ? "font-medium" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/vault-search")
-              }}
-            >
-              <Search className="h-4 w-4" />
-              <span>Vault Search</span>
-            </Link>
+                {/* Vault Search Link */}
+                <Link
+                  href="/vault-search"
+                  className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
+                    isInVaultSearch ? "font-medium" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavigation("/vault-search")
+                  }}
+                >
+                  <Search className="h-4 w-4" />
+                  <span>Vault Search</span>
+                </Link>
 
-            <Link
-              href="/vault-ai"
-              className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
-                isInVaultAI ? "font-medium" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/vault-ai")
-              }}
-            >
-              <Bot className="h-4 w-4" />
-              <span>Vault AI</span>
-            </Link>
+                {/* Vault AI Link */}
+                <Link
+                  href="/vault-ai"
+                  className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
+                    isInVaultAI ? "font-medium" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavigation("/vault-ai")
+                  }}
+                >
+                  <Bot className="h-4 w-4" />
+                  <span>Vault AI</span>
+                </Link>
 
-            <Link
-              href="/vault-tools"
-              className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
-                isInVaultTools ? "font-medium" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/vault-tools")
-              }}
-            >
-              <Tool className="h-4 w-4" />
-              <span>Vault Tools</span>
-            </Link>
+                {/* Vault Tools Link */}
+                <Link
+                  href="/vault-tools"
+                  className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
+                    isInVaultTools ? "font-medium" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavigation("/vault-tools")
+                  }}
+                >
+                  <Tool className="h-4 w-4" />
+                  <span>Vault Tools</span>
+                </Link>
+              </>
+            ) : (
+              // Subsite Navigation
+              <>
+                {currentSubSiteLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-1 ${
+                      pathname === link.href ? "font-medium" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      handleNavigation(link.href)
+                    }}
+                  >
+                    {/* Optionally add icons based on section */}
+                    <span>{link.label}</span>
+                  </Link>
+                ))}
+              </>
+            )}
 
-            <Link
-              href="/about"
-              className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 ${
-                pathname === "/about" ? "font-medium" : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/about")
-              }}
-            >
-              About
-            </Link>
-
-            {/* User Profile Dropdown */}
+            {/* Auth links */}
             {user ? (
               <div
                 className="relative"
@@ -339,214 +370,209 @@ export default function Navbar() {
 
       {/* Mobile navigation */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute left-0 right-0 bg-white dark:bg-zinc-900 p-4 shadow-lg z-10">
-          <div className="flex flex-col space-y-4">
-            {user && !isHomePage && (
-              <div className="flex items-center justify-center mb-2 points-display mx-auto">
-                <Trophy size={16} />
-                <span>{user.points} points</span>
-              </div>
-            )}
+        <div className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden" onClick={() => setIsMenuOpen(false)}></div>
+      )}
+      <div
+        className={`fixed top-0 right-0 h-full w-64 bg-white dark:bg-zinc-900 shadow-lg z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex justify-end p-4">
+          <button onClick={() => setIsMenuOpen(false)} aria-label="Close menu">
+            <X size={24} />
+          </button>
+        </div>
+        <div className="flex flex-col p-4 space-y-4">
+          {/* Always show Home link */}
+          <Link
+            href="/"
+            className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-2 ${
+              isHomePage ? "font-medium" : ""
+            }`}
+            onClick={(e) => {
+              e.preventDefault()
+              handleNavigation("/")
+            }}
+          >
+            <span>Home</span>
+          </Link>
 
-            <Link
-              href="/"
-              className="py-2 no-underline"
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/")
-              }}
-            >
-              Home
-            </Link>
-
-            <div className="py-2">
-              <button
-                className="w-full text-left font-medium mb-1 flex items-center justify-between"
-                onClick={() => toggleMobileSubMenu("gcatalog")}
-              >
-                <div className="flex items-center">
-                  <Database className="h-4 w-4 mr-1" />
-                  GCatalog
-                </div>
-                {mobileSubMenuOpen === "gcatalog" ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </button>
-
-              {mobileSubMenuOpen === "gcatalog" && (
-                <div className="pl-5 space-y-2 mt-1">
-                  <Link
-                    href="/gcatalog"
-                    className="block py-1 text-sm no-underline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavigation("/gcatalog")
-                    }}
-                  >
-                    Overview
-                  </Link>
-                  <Link
-                    href="/gcatalog/games"
-                    className="block py-1 text-sm no-underline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavigation("/gcatalog/games")
-                    }}
-                  >
-                    Browse Games
-                  </Link>
-                  <Link
-                    href="/gcatalog/play"
-                    className="block py-1 text-sm no-underline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavigation("/gcatalog/play")
-                    }}
-                  >
-                    Play Games
-                  </Link>
-                  <Link
-                    href="/gcatalog/categories"
-                    className="block py-1 text-sm no-underline"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleNavigation("/gcatalog/categories")
-                    }}
-                  >
-                    Categories
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <Link
-              href="/vault-search"
-              className="py-2 no-underline flex items-center"
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/vault-search")
-              }}
-            >
-              <Search className="h-4 w-4 mr-1" />
-              Vault Search
-            </Link>
-
-            <Link
-              href="/vault-ai"
-              className="py-2 no-underline flex items-center"
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/vault-ai")
-              }}
-            >
-              <Bot className="h-4 w-4 mr-1" />
-              Vault AI
-            </Link>
-
-            <Link
-              href="/vault-tools"
-              className="py-2 no-underline flex items-center"
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/vault-tools")
-              }}
-            >
-              <Tool className="h-4 w-4 mr-1" />
-              Vault Tools
-            </Link>
-
-            <Link
-              href="/about"
-              className="py-2 no-underline"
-              onClick={(e) => {
-                e.preventDefault()
-                handleNavigation("/about")
-              }}
-            >
-              About
-            </Link>
-
-            {user ? (
-              <>
-                <div className="border-t border-zinc-200 dark:border-zinc-800 pt-2">
-                  <div className="flex items-center gap-2">
-                    {user.profileImage ? (
-                      <div className="h-6 w-6 rounded-full overflow-hidden">
-                        <img
-                          src={user.profileImage || "/placeholder.svg"}
-                          alt={user.username}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <User size={18} className="text-zinc-500 dark:text-zinc-400" />
-                    )}
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      Logged in as {user.displayName || user.username}
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  href="/profile"
-                  className="py-2 no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/profile")
-                  }}
+          {isHomePage ? (
+            // Homepage Mobile Navigation
+            <>
+              {/* GCatalog Mobile Submenu */}
+              <div>
+                <button
+                  onClick={() => toggleMobileSubMenu("gcatalog")}
+                  className="flex items-center justify-between w-full py-2"
                 >
-                  My Profile
-                </Link>
-                <Link
-                  href="/gcatalog/favorites"
-                  className="py-2 no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog/favorites")
-                  }}
-                >
-                  My Favorites
-                </Link>
-                <Link
-                  href="/gcatalog/wishlist"
-                  className="py-2 no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog/wishlist")
-                  }}
-                >
-                  My Wishlist
-                </Link>
-                <Link
-                  href="/gcatalog/leaderboard"
-                  className="py-2 no-underline"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleNavigation("/gcatalog/leaderboard")
-                  }}
-                >
-                  Leaderboard
-                </Link>
-                <button className="py-2 text-left text-red-600 dark:text-red-400" onClick={logout}>
-                  Logout
+                  <span className={`flex items-center gap-2 ${isInGCatalog ? "font-medium" : ""}`}>
+                    <Database className="h-5 w-5" /> GCatalog
+                  </span>
+                  {mobileSubMenuOpen === "gcatalog" ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                 </button>
-              </>
-            ) : (
+                {mobileSubMenuOpen === "gcatalog" && (
+                  <div className="pl-6 mt-1 space-y-1">
+                    {gCatalogLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="block py-1 no-underline hover:text-zinc-500 dark:hover:text-zinc-400"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleNavigation(link.href)
+                        }}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Vault Search Mobile Link */}
               <Link
-                href="/auth"
+                href="/vault-search"
+                className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-2 ${
+                  isInVaultSearch ? "font-medium" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation("/vault-search")
+                }}
+              >
+                <Search className="h-5 w-5" /> Vault Search
+              </Link>
+
+              {/* Vault AI Mobile Link */}
+              <Link
+                href="/vault-ai"
+                className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-2 ${
+                  isInVaultAI ? "font-medium" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation("/vault-ai")
+                }}
+              >
+                <Bot className="h-5 w-5" /> Vault AI
+              </Link>
+
+              {/* Vault Tools Mobile Link */}
+              <Link
+                href="/vault-tools"
+                className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-2 ${
+                  isInVaultTools ? "font-medium" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation("/vault-tools")
+                }}
+              >
+                <Tool className="h-5 w-5" /> Vault Tools
+              </Link>
+            </>
+          ) : (
+            // Subsite Mobile Navigation
+            <>
+              {currentSubSiteLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`no-underline hover:text-zinc-500 dark:hover:text-zinc-400 flex items-center gap-2 ${
+                    pathname === link.href ? "font-medium" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNavigation(link.href)
+                  }}
+                >
+                  {/* Optionally add icons based on section */}
+                  <span>{link.label}</span>
+                </Link>
+              ))}
+            </>
+          )}
+
+          {/* Auth links */}
+          {user ? (
+            <>
+              <div className="border-t border-zinc-200 dark:border-zinc-800 pt-2">
+                <div className="flex items-center gap-2">
+                  {user.profileImage ? (
+                    <div className="h-6 w-6 rounded-full overflow-hidden">
+                      <img
+                        src={user.profileImage || "/placeholder.svg"}
+                        alt={user.username}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <User size={18} className="text-zinc-500 dark:text-zinc-400" />
+                  )}
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    Logged in as {user.displayName || user.username}
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/profile"
                 className="py-2 no-underline"
                 onClick={(e) => {
                   e.preventDefault()
-                  handleNavigation("/auth")
+                  handleNavigation("/profile")
                 }}
               >
-                Login / Signup
+                My Profile
               </Link>
-            )}
-          </div>
+              <Link
+                href="/gcatalog/favorites"
+                className="py-2 no-underline"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation("/gcatalog/favorites")
+                }}
+              >
+                My Favorites
+              </Link>
+              <Link
+                href="/gcatalog/wishlist"
+                className="py-2 no-underline"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation("/gcatalog/wishlist")
+                }}
+              >
+                My Wishlist
+              </Link>
+              <Link
+                href="/gcatalog/leaderboard"
+                className="py-2 no-underline"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNavigation("/gcatalog/leaderboard")
+                }}
+              >
+                Leaderboard
+              </Link>
+              <button className="py-2 text-left text-red-600 dark:text-red-400" onClick={logout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth"
+              className="py-2 no-underline"
+              onClick={(e) => {
+                e.preventDefault()
+                handleNavigation("/auth")
+              }}
+            >
+              Login / Signup
+            </Link>
+          )}
         </div>
-      )}
+      </div>
     </nav>
   )
 }
